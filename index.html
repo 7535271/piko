@@ -498,6 +498,16 @@ function drawInvite(){
   for (var k = 0; k < cs.length; k++){
     cs[k].onclick = function(){
       var id = this.getAttribute("data-id");
+      if (this.className.indexOf("dry") !== -1){
+        // 誤って赤くなったときのために、触れば戻せる
+        var r = infoOf(id);
+        if (r) { delete dry[r.home];
+          try { localStorage.setItem("piko_dry", JSON.stringify(dry)); } catch (e) {} }
+        var nm0 = document.getElementById("tname").value;
+        drawInvite();
+        document.getElementById("tname").value = nm0;
+        return;
+      }
       var at = picked.indexOf(id);
       if (at === -1) picked.push(id); else picked.splice(at, 1);
       var name = document.getElementById("tname").value;
@@ -510,7 +520,6 @@ function drawInvite(){
 }
 
 function createThread(){
-  if (!picked.length) return;
   var name = document.getElementById("tname").value.trim();
   var id = "r" + Date.now().toString(36);
   fetch(WORKER + "/threads?k=" + encodeURIComponent(pass), {
@@ -654,8 +663,10 @@ function ask(seat, called){
     if (data.error){
       var msg = String(data.error);
       faults[me.label] = msg.slice(0, 120);
-      if (/4006|used up your daily free allocation|daily limit/i.test(msg)) markDry(me.home);
-      if (/429|rate.?limit|quota|exceeded/i.test(msg)) markDry(me.home);
+      // 1日ぶんが尽きたときだけ赤くする。1分の混雑はすぐ戻るので触らない
+      if (/used up your daily free allocation|4006|daily limit|per day|RPD/i.test(msg)) {
+        markDry(me.home);
+      }
       drawBar(); drawLog(); return null;
     }
     var out = data.out || {};
@@ -696,6 +707,7 @@ function ask(seat, called){
 }
 
 function runRound(seed){
+  if (!members.length) return Promise.resolve();
   busy = true; drawLog();
   var order = members.slice().sort(function(){ return Math.random() - 0.5; });
   var next = null, d = 0;
