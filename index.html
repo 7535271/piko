@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#2e3b36">
 <title>piko</title>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 html,body{height:100%}
@@ -35,6 +35,11 @@ button,input,textarea{font-family:inherit}
 }
 #back{background:none;border:0;color:rgba(255,255,255,.5);font-size:17px;padding:2px 4px}
 #title{font-size:13.5px;color:#dfe6e0;flex:1;min-width:60px}
+#title.home{
+  text-align:center;font-size:22px;letter-spacing:.06em;
+  font-family:'Cormorant Garamond','Times New Roman',serif;
+  color:rgba(255,255,255,.82);padding:2px 0 4px;
+}
 .who{display:flex;align-items:center;gap:5px}
 .dot{width:10px;height:10px;border-radius:50%}
 .nm{font-size:12px;color:#dfe6e0}
@@ -190,12 +195,19 @@ function infoOf(id){
 /* ── 上のバー ── */
 function drawBar(){
   if (view !== "chat"){
-    $title.textContent = view === "invite" ? "\u8ab0\u3092\u547c\u3076\uff1f" : "\u03c0\u03af\u03ba\u03bf";
+    if (view === "invite"){
+      $title.textContent = "who\u2019s in?";
+      $title.className = "";
+    } else {
+      $title.textContent = "\u03c0\u03af\u03ba\u03bf";
+      $title.className = "home";
+    }
     var old = $bar.querySelectorAll(".who,.tool");
     for (var q = 0; q < old.length; q++) old[q].remove();
     return;
   }
   $title.textContent = title || "";
+  $title.className = "";
   var olds = $bar.querySelectorAll(".who,.tool");
   for (var r = 0; r < olds.length; r++) olds[r].remove();
   for (var i = 0; i < members.length; i++){
@@ -225,11 +237,11 @@ function drawThreads(){
       return r ? r.flag + " " + r.label : s;
     }).join(" \u30fb ");
     h += '<div class="thread"><div class="t" data-room="' + esc(t.room) + '">'
-      + "<b>" + esc(t.title || "\uff08\u540d\u524d\u306a\u3057\uff09") + "</b>"
-      + "<small>" + esc(faces || "\uff08\u8ab0\u3082\u3044\u306a\u3044\uff09") + "</small>"
+      + "<b>" + esc(t.title || "untitled") + "</b>"
+      + "<small>" + esc(faces || "nobody yet") + "</small>"
       + '</div><button class="x" data-del="' + esc(t.room) + '">\u00d7</button></div>';
   }
-  h += '<button id="newthread">\uff0b \u65b0\u3057\u3044\u30b0\u30eb\u30fc\u30d7</button>';
+  h += '<button id="newthread">open a new \u03c0\u03af\u03ba\u03bf</button>';
   $threads.innerHTML = h;
 
   var ts = $threads.querySelectorAll(".t");
@@ -256,8 +268,8 @@ function drawInvite(){
     var r = roster[i];
     (byOrg[r.org] = byOrg[r.org] || []).push(r);
   }
-  var h = '<input id="tname" placeholder="\u30b0\u30eb\u30fc\u30d7\u540d">';
-  h += "<h3>\u547c\u3073\u305f\u3044\u4eba\u3092\u9078\u3093\u3067</h3>";
+  var h = '<input id="tname" placeholder="name this \u03c0\u03af\u03ba\u03bf">';
+  h += "<h3>tap to invite</h3>";
   for (var org in byOrg){
     h += '<div class="org">' + esc(org) + "</div>";
     for (var j = 0; j < byOrg[org].length; j++){
@@ -267,10 +279,10 @@ function drawInvite(){
         + '<span class="f">' + m.flag + "</span>"
         + '<span class="m"><b>' + esc(m.label) + (m.preferred ? ' <span class="star">\u2726</span>' : "")
         + "</b><small>" + esc(m.home) + "</small></span>"
-        + '<span class="k">' + m.room + "</span></div>";
+        + '<span class="k">~' + m.room + ' turns/day</span></div>';
     }
   }
-  h += '<button id="go">\u3053\u306e\u4eba\u305f\u3061\u3067\u59cb\u3081\u308b</button>';
+  h += '<button id="go">start the \u03c0\u03b1\u03c1\u03ad\u03b1</button>';
   $invite.innerHTML = h;
 
   var cs = $invite.querySelectorAll(".card");
@@ -360,7 +372,7 @@ function drawLog(){
     if (openCard === i){
       h += '<div class="card-id">'
         + (mine
-            ? "\u4eba\u9593 \u30fb \u65e5\u672c \u30fb \u5973"
+            ? "human \u30fb Japan \u30fb he"
             : (s ? s.flag + " " + esc(s.org) + " \u30fb " + esc(s.label) + " \u30fb " + esc(s.home) : "?"))
         + "</div>";
     }
