@@ -34,12 +34,15 @@ button,input,textarea{font-family:inherit}
   display:flex;align-items:center;gap:9px;flex-wrap:wrap;
 }
 #back{background:none;border:0;color:rgba(255,255,255,.5);font-size:17px;padding:2px 4px}
-#title{font-size:13.5px;color:#dfe6e0;flex:1;min-width:60px}
+#title{font-size:15px;color:#dfe6e0;flex:1;min-width:60px;font-family:'Cormorant Garamond',serif;letter-spacing:.05em}
 #title.gr{
-  text-align:center;font-size:16px;letter-spacing:.05em;
-  font-family:'Cormorant Garamond',serif;color:rgba(255,255,255,.7);
+  text-align:center;font-size:18px;letter-spacing:.04em;
+  font-family:'Cormorant Garamond',serif;font-weight:400;
+  color:rgba(255,255,255,.72);
 }
-#tname{font-family:'Cormorant Garamond',serif;letter-spacing:.05em}
+#tname{font-family:'Cormorant Garamond',serif;letter-spacing:.05em;font-size:17px}
+#tname::placeholder{color:rgba(255,255,255,.32)}
+#go,#newthread{font-size:17px;font-weight:400}
 #title.home{
   text-align:center;font-size:22px;letter-spacing:.06em;
   font-family:'Cormorant Garamond','Times New Roman',serif;
@@ -569,12 +572,9 @@ function send(){
   runRound(seed);
 }
 
-if (window.visualViewport){
-  window.visualViewport.addEventListener("resize", function(){
-    document.body.style.height = window.visualViewport.height + "px";
-    if (view === "chat") $log.scrollTop = $log.scrollHeight;
-  });
-}
+$say.addEventListener("focus", function(){
+  setTimeout(function(){ if (view === "chat") $log.scrollTop = $log.scrollHeight; }, 260);
+});
 
 $send.onclick = send;
 $back.onclick = function(){
