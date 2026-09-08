@@ -61,7 +61,7 @@ body{
 }
 .msg.leaving .body{color:rgba(255,255,255,.34);font-style:italic;text-shadow:none}
 #think{font-size:11.5px;color:rgba(255,255,255,.38);padding-left:2px}
-#fault{color:#c9a08f;font-size:11px;margin-top:6px}
+#fault{color:#c9a08f;font-size:11px;margin-top:6px;line-height:1.6;word-break:break-word}
 #foot{
   padding:10px 14px;
   padding-bottom:calc(18px + env(safe-area-inset-bottom));
@@ -98,7 +98,7 @@ var TINTS = ["#a8c8d8","#e8c4a0","#b8d8b0","#d8b8d0"];
 var TIRE = 0.17, LISTEN = 0.04, REST = 0.045;
 
 var members = [], msgs = [], calls = 0, maxDepth = 6;
-var busy = false, fault = "";
+var busy = false, faults = {};
 
 var $bar = document.getElementById("bar");
 var $log = document.getElementById("log");
@@ -148,8 +148,11 @@ function drawLog(){
       + '<div class="name">' + label + "</div>"
       + '<div class="body">' + esc(m.text) + "</div></div>";
   }
-  h += '<div id="think">' + (busy ? "\u2026" : "")
-    + (fault ? '<div id="fault">' + esc(fault) + "</div>" : "") + "</div>";
+  var ferr = "";
+  for (var f in faults){
+    if (faults[f]) ferr += '<div id="fault">' + esc(f + ": " + faults[f]) + "</div>";
+  }
+  h += '<div id="think">' + (busy ? "\u2026" : "") + ferr + "</div>";
   $log.innerHTML = h;
   $log.scrollTop = $log.scrollHeight;
 }
@@ -182,7 +185,7 @@ function wipe(){
     }
     $panel.classList.remove("on");
     drawBar(); drawLog();
-  })["catch"](function(){ fault = "\u6d88\u305b\u306a\u304b\u3063\u305f"; drawLog(); });
+  })["catch"](function(){ faults["_"] = "\u6d88\u305b\u306a\u304b\u3063\u305f"; drawLog(); });
 }
 
 function keep(entry){
@@ -218,11 +221,11 @@ function ask(seat, called){
   }).then(function(r){ return r.json(); }).then(function(data){
     calls++;
     if (data.error){
-      fault = (me.provider + ": " + data.error).slice(0, 60);
+      faults[me.provider] = String(data.error).slice(0, 90);
       drawBar(); drawLog(); return null;
     }
     var out = data.out || {};
-    fault = "";
+    faults[me.provider] = "";
     var nm = (out.name || "").trim();
 
     for (var k = 0; k < members.length; k++){
@@ -265,7 +268,7 @@ function ask(seat, called){
     }
     return { called: hit, stay: !!out.stay };
   })["catch"](function(){
-    fault = "\u5c4a\u304b\u306a\u304b\u3063\u305f"; drawLog(); return null;
+    faults[me.provider] = "\u5c4a\u304b\u306a\u304b\u3063\u305f"; drawLog(); return null;
   });
 }
 
@@ -346,7 +349,7 @@ fetch(WORKER + "/providers").then(function(r){ return r.json(); }).then(function
   }
   drawBar(); drawLog();
 })["catch"](function(e){
-  fault = "\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: " + e;
+  faults["_"] = "\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: " + e;
   drawBar(); drawLog();
 });
 </script>
