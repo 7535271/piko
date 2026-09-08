@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#2e3b36">
 <title>piko</title>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Cormorant+Garamond:wght@300;400;500&subset=greek,latin&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=EB+Garamond:wght@400;500&display=block" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 html,body{height:100%}
@@ -24,6 +25,13 @@ body{
 }
 button,input,textarea{font-family:inherit}
 .hide{display:none!important}
+.g{
+  font-family:'EB Garamond',serif;
+  font-weight:500;
+  letter-spacing:0;
+  font-size:1.18em;
+  vertical-align:-.02em;
+}
 
 /* ── 上のバー ── */
 #bar{
@@ -34,19 +42,19 @@ button,input,textarea{font-family:inherit}
   display:flex;align-items:center;gap:9px;flex-wrap:wrap;
 }
 #back{background:none;border:0;color:rgba(255,255,255,.5);font-size:17px;padding:2px 4px}
-#title{font-size:15px;color:#dfe6e0;flex:1;min-width:60px;font-family:'Cormorant Garamond',serif;letter-spacing:.05em}
+#title{font-size:16px;color:#dfe6e0;flex:1;min-width:60px;font-family:'EB Garamond',serif;letter-spacing:0}
 #title.gr{
-  text-align:center;font-size:18px;letter-spacing:.04em;
-  font-family:'Cormorant Garamond',serif;font-weight:400;
+  text-align:center;font-size:19px;letter-spacing:0;
+  font-family:'EB Garamond',serif;font-weight:400;
   color:rgba(255,255,255,.72);
 }
-#tname{font-family:'Cormorant Garamond',serif;letter-spacing:.05em;font-size:17px}
+#tname{font-family:'EB Garamond',serif;font-weight:500;letter-spacing:0;font-size:19px}
 #tname::placeholder{color:rgba(255,255,255,.32)}
-#go,#newthread{font-size:17px;font-weight:400}
+#go,#newthread{font-size:18px;font-weight:400}
 #title.home{
-  text-align:center;font-size:22px;letter-spacing:.06em;
-  font-family:'Cormorant Garamond','Times New Roman',serif;
-  color:rgba(255,255,255,.82);padding:2px 0 4px;
+  text-align:center;font-size:25px;letter-spacing:0;
+  font-family:'EB Garamond',serif;font-weight:500;
+  color:rgba(255,255,255,.85);padding:2px 0 4px;
 }
 .who{display:flex;align-items:center;gap:5px}
 .dot{width:10px;height:10px;border-radius:50%}
@@ -71,13 +79,13 @@ button,input,textarea{font-family:inherit}
 .thread .x.yes,.thread .x.no{
   font-size:12px;padding:7px 11px;border-radius:4px;
   border:1px solid rgba(255,255,255,.18);
-  font-family:'Cormorant Garamond',serif;letter-spacing:.04em;
+  font-family:'EB Garamond',serif;letter-spacing:.04em;
 }
 .thread .x.yes{color:#e0a98c}
 .thread .x.no{color:rgba(255,255,255,.55);margin-left:6px}
 .thread .t small.ask{color:rgba(255,255,255,.55)}
 #newthread{
-  font-family:'Cormorant Garamond',serif;letter-spacing:.05em;
+  font-family:'EB Garamond',serif;letter-spacing:0;
   width:100%;padding:14px;border-radius:5px;
   border:1px dashed rgba(255,255,255,.24);background:none;
   color:rgba(255,255,255,.55);font-size:15px;margin-top:6px;
@@ -85,8 +93,8 @@ button,input,textarea{font-family:inherit}
 
 /* ── 招待 ── */
 #invite{flex:1;overflow-y:auto;padding:18px 16px}
-#invite h3{font-size:12.5px;font-weight:400;color:rgba(255,255,255,.45);margin:0 0 4px;letter-spacing:.06em;font-family:'Cormorant Garamond',serif}
-.org{font-size:11px;color:rgba(255,255,255,.35);margin:18px 0 7px;letter-spacing:.08em;font-family:'Cormorant Garamond',serif}
+#invite h3{font-size:12.5px;font-weight:400;color:rgba(255,255,255,.45);margin:0 0 4px;letter-spacing:.06em;font-family:'EB Garamond',serif}
+.org{font-size:11px;color:rgba(255,255,255,.35);margin:18px 0 7px;letter-spacing:.1em;font-family:'EB Garamond',serif}
 .card{
   padding:11px 13px;margin-bottom:7px;border-radius:5px;
   border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.025);
@@ -97,13 +105,13 @@ button,input,textarea{font-family:inherit}
 .card .m{flex:1}
 .card .m b{font-size:13.5px;font-weight:400;display:block}
 .card .m small{font-size:10.5px;color:rgba(255,255,255,.38)}
-.card .k{font-size:10px;color:rgba(255,255,255,.28);white-space:nowrap;font-family:'Cormorant Garamond',serif;letter-spacing:.03em}
+.card .k{font-size:10px;color:rgba(255,255,255,.28);white-space:nowrap;font-family:'EB Garamond',serif;letter-spacing:.03em}
 .star{color:#e8c4a0}
 #go{
   position:sticky;bottom:0;width:100%;padding:13px;margin-top:14px;
   border-radius:5px;border:1px solid rgba(255,255,255,.24);
   background:#3b4a44;color:rgba(255,255,255,.9);font-size:15px;
-  font-family:'Cormorant Garamond',serif;letter-spacing:.05em;
+  font-family:'EB Garamond',serif;letter-spacing:0;
 }
 #tname{
   width:100%;padding:11px 14px;border-radius:5px;margin-bottom:16px;
@@ -127,7 +135,7 @@ button,input,textarea{font-family:inherit}
 .msg.leaving .body{color:rgba(255,255,255,.34);font-style:italic;text-shadow:none}
 .card-id{
   font-size:10.5px;color:rgba(255,255,255,.4);padding:4px 4px 2px;
-  line-height:1.8;font-family:'Cormorant Garamond',serif;letter-spacing:.04em;
+  line-height:1.8;font-family:'EB Garamond',serif;letter-spacing:.04em;
 }
 #think{font-size:11.5px;color:rgba(255,255,255,.38);padding-left:2px}
 .typing i{
@@ -222,17 +230,17 @@ function infoOf(id){
 function drawBar(){
   if (view !== "chat"){
     if (view === "invite"){
-      $title.textContent = "\u03c0\u03bf\u03b9\u03bf\u03b9 \u03b5\u03af\u03bd\u03b1\u03b9 \u03b5\u03b4\u03ce;";
+      $title.innerHTML = '<span class="g">\u03c0\u03bf\u03b9\u03bf\u03b9 \u03b5\u03af\u03bd\u03b1\u03b9 \u03b5\u03b4\u03ce;</span>';
       $title.className = "gr";
     } else {
-      $title.textContent = "\u03c0\u03af\u03ba\u03bf";
+      $title.innerHTML = '<span class="g">\u03c0\u03af\u03ba\u03bf</span>';
       $title.className = "home";
     }
     var old = $bar.querySelectorAll(".who,.tool");
     for (var q = 0; q < old.length; q++) old[q].remove();
     return;
   }
-  $title.textContent = title || "\u03cc\u03bd\u03bf\u03bc\u03b1";
+  $title.innerHTML = title ? esc(title) : '<span class="g">\u03cc\u03bd\u03bf\u03bc\u03b1</span>';
   $title.className = "";
   $title.onclick = rename;
   $title.style.cursor = "pointer";
@@ -266,7 +274,7 @@ function drawThreads(){
     }).join(" \u30fb ");
     if (pendingDel === t.room){
       h += '<div class="thread"><div class="t"><b>' + esc(t.title || "untitled") + "</b>"
-        + '<small class="ask">close this \u03c0\u03b1\u03c1\u03ad\u03b1 for good?</small></div>'
+        + '<small class="ask">close this <span class="g">\u03c0\u03b1\u03c1\u03ad\u03b1</span> for good?</small></div>'
         + '<button class="x yes" data-yes="' + esc(t.room) + '">close</button>'
         + '<button class="x no">keep</button></div>';
     } else {
@@ -276,7 +284,7 @@ function drawThreads(){
         + '</div><button class="x" data-del="' + esc(t.room) + '">\u00d7</button></div>';
     }
   }
-  h += '<button id="newthread">open a new \u03c0\u03af\u03ba\u03bf</button>';
+  h += '<button id="newthread">open a new <span class="g">\u03c0\u03af\u03ba\u03bf</span></button>';
   $threads.innerHTML = h;
 
   var ts = $threads.querySelectorAll(".t");
@@ -329,7 +337,7 @@ function drawInvite(){
         + '<span class="k">~' + m.room + ' turns/day</span></div>';
     }
   }
-  h += '<button id="go">\u03c0\u03ac\u03bc\u03b5 \u03c0\u03b1\u03c1\u03ad\u03b1</button>';
+  h += '<button id="go"><span class="g">\u03c0\u03ac\u03bc\u03b5 \u03c0\u03b1\u03c1\u03ad\u03b1</span></button>';
   $invite.innerHTML = h;
 
   var cs = $invite.querySelectorAll(".card");
