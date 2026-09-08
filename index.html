@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="piko">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2e3b36">
+<title>piko</title>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html,body{height:100%}
+body{
+  background:#2e3b36;
+  background-image:
+    radial-gradient(ellipse at 22% 18%,rgba(255,255,255,.045),transparent 58%),
+    radial-gradient(ellipse at 78% 82%,rgba(255,255,255,.03),transparent 55%);
+  font-family:'Klee One','Hiragino Sans',sans-serif;
+  display:flex;flex-direction:column;
+  -webkit-tap-highlight-color:transparent;
+}
+#bar{
+  padding:14px 16px 10px;
+  padding-top:calc(14px + env(safe-area-inset-top));
+  border-bottom:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.022);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.who{display:flex;align-items:center;gap:6px}
+.dot{width:11px;height:11px;border-radius:50%}
+.nm{font-size:12.5px;color:#dfe6e0}
+.gauge{width:26px;height:3px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
+.gauge i{display:block;height:100%;background:rgba(255,255,255,.55);transition:width .6s ease}
+.gauge i.hot{background:#e0a98c}
+.out{opacity:.34}
+#count{margin-left:auto;font-size:11px;color:rgba(255,255,255,.42);background:none;border:0;font-family:inherit}
+#panel{
+  display:none;padding:12px 16px;font-size:12px;color:#b8c4bc;
+  background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.11);
+}
+#panel.on{display:block}
+#panel input[type=range]{width:100%;margin-top:4px;accent-color:#cdd6cf}
+.btn{
+  padding:7px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.17);
+  background:rgba(255,255,255,.045);color:#cdd6cf;font-size:11.5px;
+  font-family:inherit;cursor:pointer;width:100%;margin-top:8px;
+}
+#log{flex:1;overflow-y:auto;padding:18px 16px 8px}
+#log::-webkit-scrollbar{width:0}
+.msg{margin-bottom:14px;max-width:88%}
+.msg .name{
+  font-size:11px;margin-bottom:5px;padding-left:2px;height:11px;
+  display:flex;align-items:center;gap:6px;
+}
+.pip{width:9px;height:9px;border-radius:50%;display:inline-block}
+.msg .body{
+  padding:2px 4px;font-size:15px;line-height:1.85;white-space:pre-wrap;
+  color:rgba(255,255,255,.9);text-shadow:0 0 1px rgba(255,255,255,.5);
+}
+.msg.leaving .body{color:rgba(255,255,255,.34);font-style:italic;text-shadow:none}
+#think{font-size:11.5px;color:rgba(255,255,255,.38);padding-left:2px}
+#fault{color:#c9a08f;font-size:11px;margin-top:6px}
+#foot{
+  padding:10px 14px;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom));
+  border-top:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.022);display:flex;gap:8px;align-items:flex-end;
+}
+#say{
+  flex:1;padding:11px 15px;border-radius:4px;
+  border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.045);
+  font-size:15px;font-family:inherit;resize:none;max-height:150px;
+  color:rgba(255,255,255,.92);
+}
+#say:focus,#send:focus{outline:1px solid rgba(255,255,255,.3)}
+#send{
+  width:42px;height:42px;flex-shrink:0;border-radius:4px;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);
+  color:rgba(255,255,255,.85);font-size:16px;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="panel"></div>
+<div id="log"></div>
+<div id="foot">
+  <textarea id="say" rows="2"></textarea>
+  <button id="send">&#8593;</button>
+</div>
+
+<script>
+var WORKER = "https://piko-worker.stella-753-5271.workers.dev";
+var ROOM = "main";
+var TINTS = ["#a8c8d8","#e8c4a0","#b8d8b0","#d8b8d0"];
+var TIRE = 0.17, LISTEN = 0.04, REST = 0.045;
+
+var members = [], msgs = [], calls = 0, maxDepth = 6;
+var busy = false, fault = "";
+
+var $bar = document.getElementById("bar");
+var $log = document.getElementById("log");
+var $say = document.getElementById("say");
+var $send = document.getElementById("send");
+var $panel = document.getElementById("panel");
+
+function esc(s){
+  return String(s).replace(/[&<>]/g, function(c){
+    return c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;";
+  });
+}
+
+function tintOf(seat){
+  for (var i = 0; i < members.length; i++){
+    if (members[i].id === seat) return members[i].tint;
+  }
+  return "rgba(255,255,255,0.4)";
+}
+
+function drawBar(){
+  var h = "";
+  for (var i = 0; i < members.length; i++){
+    var m = members[i];
+    h += '<div class="who' + (m.out ? " out" : "") + '">'
+      + '<span class="dot" style="background:' + m.tint + '"></span>'
+      + (m.name ? '<span class="nm">' + esc(m.name) + "</span>" : "")
+      + '<span class="gauge"><i class="' + (m.fatigue > 0.7 ? "hot" : "")
+      + '" style="width:' + (m.fatigue * 100) + '%"></i></span>'
+      + "</div>";
+  }
+  h += '<button id="count">' + calls + "\u56de</button>";
+  $bar.innerHTML = h;
+  document.getElementById("count").onclick = togglePanel;
+}
+
+function drawLog(){
+  var h = "";
+  for (var i = 0; i < msgs.length; i++){
+    var m = msgs[i];
+    var mine = m.seat === "me";
+    var tint = mine ? "rgba(255,255,255,0.5)" : tintOf(m.seat);
+    var label = (mine || m.named)
+      ? '<span style="color:' + tint + '">' + esc(m.who) + "</span>"
+      : '<span class="pip" style="background:' + tint + '"></span>';
+    h += '<div class="msg' + (m.leaving ? " leaving" : "") + '">'
+      + '<div class="name">' + label + "</div>"
+      + '<div class="body">' + esc(m.text) + "</div></div>";
+  }
+  h += '<div id="think">' + (busy ? "\u2026" : "")
+    + (fault ? '<div id="fault">' + esc(fault) + "</div>" : "") + "</div>";
+  $log.innerHTML = h;
+  $log.scrollTop = $log.scrollHeight;
+}
+
+function togglePanel(){
+  $panel.classList.toggle("on");
+  if (!$panel.classList.contains("on")) return;
+  var h = '<div id="deplabel">\u9023\u9396\u306e\u4e0a\u9650\u3000' + maxDepth + "</div>"
+    + '<input type="range" min="0" max="14" value="' + maxDepth + '" id="dep">';
+  for (var i = 0; i < members.length; i++){
+    h += '<div style="line-height:1.9;color:#8b95a0">'
+      + (members[i].name ? esc(members[i].name) : "\uff08\u307e\u3060\u540d\u4e57\u3063\u3066\u306a\u3044\uff09")
+      + " \u2014 " + esc(members[i].provider) + "</div>";
+  }
+  h += '<button class="btn" id="wipe">\u3053\u306e\u90e8\u5c4b\u306e\u4f1a\u8a71\u3092\u6d88\u3059</button>';
+  $panel.innerHTML = h;
+  document.getElementById("dep").oninput = function(e){
+    maxDepth = Number(e.target.value);
+    document.getElementById("deplabel").textContent =
+      "\u9023\u9396\u306e\u4e0a\u9650\u3000" + maxDepth;
+  };
+  document.getElementById("wipe").onclick = wipe;
+}
+
+function wipe(){
+  fetch(WORKER + "/log?room=" + ROOM, { method: "DELETE" }).then(function(){
+    msgs = [];
+    for (var i = 0; i < members.length; i++){
+      members[i].name = ""; members[i].fatigue = 0; members[i].out = false;
+    }
+    $panel.classList.remove("on");
+    drawBar(); drawLog();
+  })["catch"](function(){ fault = "\u6d88\u305b\u306a\u304b\u3063\u305f"; drawLog(); });
+}
+
+function keep(entry){
+  fetch(WORKER + "/log?room=" + ROOM, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry)
+  })["catch"](function(){});
+}
+
+function ask(seat, called){
+  var me = null;
+  for (var i = 0; i < members.length; i++){
+    if (members[i].id === seat) me = members[i];
+  }
+  if (!me || me.out) return Promise.resolve(null);
+
+  var roster = [];
+  for (var j = 0; j < members.length; j++){
+    roster.push({ name: members[j].name, out: members[j].out });
+  }
+  var tail = msgs.slice(-14).map(function(m){
+    return { who: m.who, text: m.text };
+  });
+
+  return fetch(WORKER + "/speak?room=" + ROOM, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      provider: me.provider, model: me.model, name: me.name,
+      fatigue: me.fatigue, called: called, members: roster, log: tail
+    })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    calls++;
+    if (data.error){
+      fault = (me.provider + ": " + data.error).slice(0, 60);
+      drawBar(); drawLog(); return null;
+    }
+    var out = data.out || {};
+    fault = "";
+    var nm = (out.name || "").trim();
+
+    for (var k = 0; k < members.length; k++){
+      if (members[k].id === seat){
+        if (nm) members[k].name = nm;
+        if (out.leaving) members[k].out = true;
+        members[k].fatigue = Math.min(1,
+          members[k].fatigue + (out.speak ? TIRE : LISTEN));
+      } else {
+        members[k].fatigue = Math.max(0, members[k].fatigue - REST);
+      }
+    }
+
+    if (out.leaving){
+      var bye = {
+        who: nm || me.name || "", seat: seat, named: !!(nm || me.name),
+        text: (out.text || "").trim() || "\u5c11\u3057\u4f11\u3080", leaving: true
+      };
+      msgs.push(bye); keep(bye); drawBar(); drawLog();
+      return null;
+    }
+    if (!out.speak || !out.text){
+      drawBar(); drawLog();
+      return { called: null, stay: false };
+    }
+
+    var text = out.text.trim();
+    var entry = {
+      who: nm || me.name || "", seat: seat, text: text,
+      named: !!(nm || me.name)
+    };
+    msgs.push(entry); keep(entry); drawBar(); drawLog();
+
+    var hit = null;
+    for (var n = 0; n < members.length; n++){
+      var o = members[n];
+      if (o.id !== seat && !o.out && o.name && text.indexOf("@" + o.name) !== -1){
+        hit = o.id;
+      }
+    }
+    return { called: hit, stay: !!out.stay };
+  })["catch"](function(){
+    fault = "\u5c4a\u304b\u306a\u304b\u3063\u305f"; drawLog(); return null;
+  });
+}
+
+function runRound(seed){
+  busy = true; drawLog();
+  var order = members.slice().sort(function(){ return Math.random() - 0.5; });
+  var next = null, d = 0;
+
+  function opening(i){
+    if (i >= order.length) return Promise.resolve();
+    return ask(order[i].id, seed ? seed === order[i].id : false).then(function(r){
+      if (r && !next){
+        if (r.called) next = { seat: r.called, called: true };
+        else if (r.stay) next = { seat: order[i].id, called: false };
+      }
+      return opening(i + 1);
+    });
+  }
+
+  function chain(){
+    if (!next || d >= maxDepth) return Promise.resolve();
+    d++;
+    var cur = next;
+    return ask(cur.seat, cur.called).then(function(r){
+      if (!r){ next = null; return; }
+      if (r.called) next = { seat: r.called, called: true };
+      else if (r.stay) next = { seat: cur.seat, called: false };
+      else next = null;
+      return chain();
+    });
+  }
+
+  return opening(0).then(chain).then(function(){
+    busy = false; drawLog();
+  });
+}
+
+function send(){
+  var t = $say.value.trim();
+  if (!t || busy) return;
+  var mine = { who: "\u3057\u3085\u3046", seat: "me", text: t, named: true };
+  msgs.push(mine); keep(mine); $say.value = ""; drawLog();
+  var seed = null;
+  for (var i = 0; i < members.length; i++){
+    var m = members[i];
+    if (!m.out && m.name && t.indexOf("@" + m.name) !== -1) seed = m.id;
+  }
+  runRound(seed);
+}
+
+$send.onclick = send;
+
+drawBar();
+
+fetch(WORKER + "/providers").then(function(r){ return r.json(); }).then(function(pr){
+  var list = pr.providers || [];
+  members = list.map(function(p, i){
+    return {
+      id: p.id, provider: p.id, model: p.model,
+      tint: TINTS[i % TINTS.length], name: "", fatigue: 0, out: false
+    };
+  });
+  drawBar();
+  return fetch(WORKER + "/log?room=" + ROOM).then(function(r){ return r.json(); });
+}).then(function(lg){
+  msgs = (lg.log || []).map(function(r){
+    return {
+      who: r.who || "", seat: r.seat || "", text: r.text,
+      named: !!r.named, leaving: !!r.leaving
+    };
+  });
+  for (var i = 0; i < members.length; i++){
+    for (var j = msgs.length - 1; j >= 0; j--){
+      if (msgs[j].seat === members[i].id && msgs[j].named && msgs[j].who){
+        members[i].name = msgs[j].who; break;
+      }
+    }
+  }
+  drawBar(); drawLog();
+})["catch"](function(e){
+  fault = "\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: " + e;
+  drawBar(); drawLog();
+});
+</script>
+</body>
+</html>
