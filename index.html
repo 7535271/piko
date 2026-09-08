@@ -177,9 +177,14 @@ button,input,textarea{font-family:inherit}
 #log::-webkit-scrollbar,#threads::-webkit-scrollbar,#invite::-webkit-scrollbar{width:0}
 .msg{margin-bottom:14px;max-width:88%}
 .msg .name{
-  font-size:11px;margin-bottom:5px;padding-left:2px;height:12px;
+  font-size:11px;margin-bottom:5px;padding-left:2px;min-height:14px;
   display:flex;align-items:center;gap:6px;cursor:pointer;
 }
+.copy{
+  background:none;border:0;padding:1px 5px;margin-left:2px;
+  color:rgba(255,255,255,.22);font-size:11px;line-height:1;cursor:pointer;
+}
+.copy:active{color:rgba(255,255,255,.7)}
 .pip{width:9px;height:9px;border-radius:50%;display:inline-block}
 .msg .body{
   padding:2px 4px;font-size:15px;line-height:1.85;white-space:pre-wrap;
@@ -588,7 +593,8 @@ function drawLog(hold){
       ? '<span style="color:' + tint + '">' + esc(m.who) + "</span>"
       : '<span class="pip" style="background:' + tint + '"></span>';
     h += '<div class="msg' + (m.leaving ? " leaving" : "") + '">'
-      + '<div class="name" data-i="' + i + '">' + label + "</div>";
+      + '<div class="name" data-i="' + i + '">' + label
+      + '<button class="copy" data-c="' + i + '">\u2750</button></div>';
     if (openCard === i){
       h += '<div class="card-id" data-close="1">'
         + (mine
@@ -618,6 +624,23 @@ function drawLog(hold){
   for (var w = 0; w < cc.length; w++){
     cc[w].onclick = function(){ openCard = null; drawLog(true); };
   }
+  var cp = $log.querySelectorAll(".copy");
+  for (var y = 0; y < cp.length; y++){
+    cp[y].onclick = function(e){
+      e.stopPropagation();
+      var t = msgs[Number(this.getAttribute("data-c"))].text;
+      var self = this;
+      var done = function(){
+        self.innerHTML = "&#10003;";
+        setTimeout(function(){ self.innerHTML = "&#10064;"; }, 1100);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(done)["catch"](function(){ fallback(t, done); });
+      } else {
+        fallback(t, done);
+      }
+    };
+  }
   var ns = $log.querySelectorAll(".name");
   for (var q = 0; q < ns.length; q++){
     ns[q].onclick = function(){
@@ -639,6 +662,18 @@ function rename(){
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ room: room, title: title, seats: seats })
   }).then(function(){ drawBar(); })["catch"](function(){});
+}
+
+function fallback(t, done){
+  var ta = document.createElement("textarea");
+  ta.value = t;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, t.length);
+  try { document.execCommand("copy"); done(); } catch (e) {}
+  document.body.removeChild(ta);
 }
 
 function keep(e){
