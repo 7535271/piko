@@ -151,7 +151,10 @@ button,input,textarea{font-family:inherit}
   display:flex;align-items:center;gap:10px;
 }
 .card.on{border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.075)}
-.card.dry{border-color:rgba(224,140,110,.32);background:rgba(224,120,90,.06)}
+.card.dry{
+  border-color:rgba(224,140,110,.26);background:rgba(224,120,90,.05);
+  pointer-events:none;
+}
 .card.dry .m b,.card.dry .f{opacity:.42}
 .card.dry .k{color:#d99a7c}
 .card .f{font-size:16px}
@@ -503,16 +506,8 @@ function drawInvite(){
   for (var k = 0; k < cs.length; k++){
     cs[k].onclick = function(){
       var id = this.getAttribute("data-id");
-      if (this.className.indexOf("dry") !== -1){
-        // 誤って赤くなったときのために、触れば戻せる
-        var r = infoOf(id);
-        if (r) { delete dry[r.home];
-          try { localStorage.setItem("piko_dry", JSON.stringify(dry)); } catch (e) {} }
-        var nm0 = document.getElementById("tname").value;
-        drawInvite();
-        document.getElementById("tname").value = nm0;
-        return;
-      }
+      var r0 = infoOf(id);
+      if (r0 && isDry(r0.home)) return;   // 今日ぶんが尽きた子は誘えない
       var at = picked.indexOf(id);
       if (at === -1) picked.push(id); else picked.splice(at, 1);
       var name = document.getElementById("tname").value;
@@ -525,6 +520,10 @@ function drawInvite(){
 }
 
 function createThread(){
+  picked = picked.filter(function(id){
+    var r = infoOf(id);
+    return !(r && isDry(r.home));
+  });
   var name = document.getElementById("tname").value.trim();
   var id = "r" + Date.now().toString(36);
   fetch(WORKER + "/threads?k=" + encodeURIComponent(pass), {
