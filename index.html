@@ -19,49 +19,97 @@ body{
     radial-gradient(ellipse at 78% 82%,rgba(255,255,255,.03),transparent 55%);
   font-family:'Klee One','Hiragino Sans',sans-serif;
   display:flex;flex-direction:column;
+  color:rgba(255,255,255,.9);
   -webkit-tap-highlight-color:transparent;
 }
+button,input,textarea{font-family:inherit}
+.hide{display:none!important}
+
+/* ── 上のバー ── */
 #bar{
-  padding:14px 16px 10px;
-  padding-top:calc(14px + env(safe-area-inset-top));
+  padding:12px 14px 10px;
+  padding-top:calc(12px + env(safe-area-inset-top));
   border-bottom:1px solid rgba(255,255,255,.11);
   background:rgba(255,255,255,.022);
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
 }
-.who{display:flex;align-items:center;gap:6px}
-.dot{width:11px;height:11px;border-radius:50%}
-.nm{font-size:12.5px;color:#dfe6e0}
-.gauge{width:26px;height:3px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
-.gauge i{display:block;height:100%;background:rgba(255,255,255,.55);transition:width .6s ease}
+#back{background:none;border:0;color:rgba(255,255,255,.5);font-size:17px;padding:2px 4px}
+#title{font-size:13.5px;color:#dfe6e0;flex:1;min-width:60px}
+.who{display:flex;align-items:center;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%}
+.nm{font-size:12px;color:#dfe6e0}
+.gauge{width:22px;height:3px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
+.gauge i{display:block;height:100%;background:rgba(255,255,255,.55);transition:width .6s}
 .gauge i.hot{background:#e0a98c}
 .out{opacity:.34}
-#count{margin-left:auto;font-size:11px;color:rgba(255,255,255,.42);background:none;border:0;font-family:inherit}
-#panel{
-  display:none;padding:12px 16px;font-size:12px;color:#b8c4bc;
-  background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.11);
+.tool{background:none;border:0;color:rgba(255,255,255,.42);font-size:11px;padding:2px 3px}
+
+/* ── スレッド一覧 ── */
+#threads{flex:1;overflow-y:auto;padding:20px 16px}
+.thread{
+  padding:14px 16px;margin-bottom:10px;border-radius:5px;
+  border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.03);
+  display:flex;align-items:center;gap:10px;
 }
-#panel.on{display:block}
-#panel input[type=range]{width:100%;margin-top:4px;accent-color:#cdd6cf}
-.btn{
-  padding:7px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.17);
-  background:rgba(255,255,255,.045);color:#cdd6cf;font-size:11.5px;
-  font-family:inherit;cursor:pointer;width:100%;margin-top:8px;
+.thread .t{flex:1}
+.thread .t b{font-size:14.5px;font-weight:400;display:block}
+.thread .t small{font-size:11px;color:rgba(255,255,255,.42);line-height:1.7}
+.thread .x{background:none;border:0;color:rgba(255,255,255,.3);font-size:15px;padding:6px}
+#newthread{
+  width:100%;padding:13px;border-radius:5px;
+  border:1px dashed rgba(255,255,255,.24);background:none;
+  color:rgba(255,255,255,.6);font-size:13.5px;margin-top:6px;
 }
+
+/* ── 招待 ── */
+#invite{flex:1;overflow-y:auto;padding:18px 16px}
+#invite h3{font-size:13px;font-weight:400;color:rgba(255,255,255,.5);margin:0 0 12px}
+.org{font-size:11px;color:rgba(255,255,255,.35);margin:16px 0 6px}
+.card{
+  padding:11px 13px;margin-bottom:7px;border-radius:5px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.025);
+  display:flex;align-items:center;gap:10px;
+}
+.card.on{border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.075)}
+.card .f{font-size:16px}
+.card .m{flex:1}
+.card .m b{font-size:13.5px;font-weight:400;display:block}
+.card .m small{font-size:10.5px;color:rgba(255,255,255,.38)}
+.card .k{font-size:10px;color:rgba(255,255,255,.3)}
+.star{color:#e8c4a0}
+#go{
+  position:sticky;bottom:0;width:100%;padding:13px;margin-top:14px;
+  border-radius:5px;border:1px solid rgba(255,255,255,.24);
+  background:#3b4a44;color:rgba(255,255,255,.9);font-size:14px;
+}
+#tname{
+  width:100%;padding:11px 14px;border-radius:5px;margin-bottom:16px;
+  border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.045);
+  color:rgba(255,255,255,.92);font-size:14px;
+}
+
+/* ── 会話 ── */
 #log{flex:1;overflow-y:auto;padding:18px 16px 8px}
-#log::-webkit-scrollbar{width:0}
+#log::-webkit-scrollbar,#threads::-webkit-scrollbar,#invite::-webkit-scrollbar{width:0}
 .msg{margin-bottom:14px;max-width:88%}
 .msg .name{
-  font-size:11px;margin-bottom:5px;padding-left:2px;height:11px;
-  display:flex;align-items:center;gap:6px;
+  font-size:11px;margin-bottom:5px;padding-left:2px;height:12px;
+  display:flex;align-items:center;gap:6px;cursor:pointer;
 }
 .pip{width:9px;height:9px;border-radius:50%;display:inline-block}
 .msg .body{
   padding:2px 4px;font-size:15px;line-height:1.85;white-space:pre-wrap;
-  color:rgba(255,255,255,.9);text-shadow:0 0 1px rgba(255,255,255,.5);
+  text-shadow:0 0 1px rgba(255,255,255,.5);
 }
 .msg.leaving .body{color:rgba(255,255,255,.34);font-style:italic;text-shadow:none}
+.card-id{
+  font-size:10.5px;color:rgba(255,255,255,.4);padding:5px 4px 0;
+  line-height:1.8;
+}
 #think{font-size:11.5px;color:rgba(255,255,255,.38);padding-left:2px}
-#fault{color:#c9a08f;font-size:11px;margin-top:6px;line-height:1.6;word-break:break-word}
+.fault{color:#c9a08f;font-size:11px;margin-top:6px;line-height:1.6;word-break:break-word}
+
+/* ── 入力 ── */
 #foot{
   padding:10px 14px;
   padding-bottom:calc(18px + env(safe-area-inset-bottom));
@@ -69,206 +117,330 @@ body{
   background:rgba(255,255,255,.022);display:flex;gap:8px;align-items:flex-end;
 }
 #say{
-  flex:1;padding:11px 15px;border-radius:4px;
+  flex:1;padding:11px 15px;border-radius:5px;
   border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.045);
-  font-size:15px;font-family:inherit;resize:none;max-height:150px;
-  color:rgba(255,255,255,.92);
+  font-size:15px;resize:none;max-height:150px;color:rgba(255,255,255,.92);
 }
-#say:focus,#send:focus{outline:1px solid rgba(255,255,255,.3)}
+#say:focus,button:focus{outline:1px solid rgba(255,255,255,.3)}
 #send{
-  width:42px;height:42px;flex-shrink:0;border-radius:4px;
+  width:42px;height:42px;flex-shrink:0;border-radius:5px;
   border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);
-  color:rgba(255,255,255,.85);font-size:16px;cursor:pointer;
+  color:rgba(255,255,255,.85);font-size:16px;
 }
 </style>
 </head>
 <body>
-<div id="bar"></div>
-<div id="panel"></div>
-<div id="log"></div>
-<div id="foot">
+
+<div id="bar">
+  <button id="back" class="hide">&#8592;</button>
+  <div id="title">&#960;&#943;&#954;&#959;</div>
+</div>
+
+<div id="threads"></div>
+<div id="invite" class="hide"></div>
+<div id="log" class="hide"></div>
+<div id="foot" class="hide">
   <textarea id="say" rows="2"></textarea>
   <button id="send">&#8593;</button>
 </div>
 
 <script>
 var WORKER = "https://piko-worker.stella-753-5271.workers.dev";
-var ROOM = "main";
-var TINTS = ["#a8c8d8","#e8c4a0","#b8d8b0","#d8b8d0"];
+var TINTS = ["#a8c8d8","#e8c4a0","#b8d8b0","#d8b8d0","#c8c0e0","#e0c8b0"];
 var TIRE = 0.17, LISTEN = 0.04, REST = 0.045;
 
-var members = [], msgs = [], calls = 0, maxDepth = 6;
-var busy = false, faults = {};
+var view = "threads";       // threads | invite | chat
+var roster = [], threads = [];
+var room = null, title = "", members = [], msgs = [];
+var picked = [], calls = 0, maxDepth = 6;
+var busy = false, faults = {}, openCard = null;
 
 var $bar = document.getElementById("bar");
+var $back = document.getElementById("back");
+var $title = document.getElementById("title");
+var $threads = document.getElementById("threads");
+var $invite = document.getElementById("invite");
 var $log = document.getElementById("log");
+var $foot = document.getElementById("foot");
 var $say = document.getElementById("say");
 var $send = document.getElementById("send");
-var $panel = document.getElementById("panel");
 
 function esc(s){
-  return String(s).replace(/[&<>]/g, function(c){
-    return c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;";
+  return String(s).replace(/[&<>"]/g, function(c){
+    return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;";
   });
 }
-
-function tintOf(seat){
-  for (var i = 0; i < members.length; i++){
-    if (members[i].id === seat) return members[i].tint;
-  }
-  return "rgba(255,255,255,0.4)";
+function show(v){
+  view = v;
+  $threads.classList.toggle("hide", v !== "threads");
+  $invite.classList.toggle("hide", v !== "invite");
+  $log.classList.toggle("hide", v !== "chat");
+  $foot.classList.toggle("hide", v !== "chat");
+  $back.classList.toggle("hide", v === "threads");
+}
+function seatOf(id){
+  for (var i = 0; i < members.length; i++) if (members[i].id === id) return members[i];
+  return null;
+}
+function infoOf(id){
+  for (var i = 0; i < roster.length; i++) if (roster[i].id === id) return roster[i];
+  return null;
 }
 
+/* ── 上のバー ── */
 function drawBar(){
-  var h = "";
+  if (view !== "chat"){
+    $title.textContent = view === "invite" ? "\u8ab0\u3092\u547c\u3076\uff1f" : "\u03c0\u03af\u03ba\u03bf";
+    var old = $bar.querySelectorAll(".who,.tool");
+    for (var q = 0; q < old.length; q++) old[q].remove();
+    return;
+  }
+  $title.textContent = title || "";
+  var olds = $bar.querySelectorAll(".who,.tool");
+  for (var r = 0; r < olds.length; r++) olds[r].remove();
   for (var i = 0; i < members.length; i++){
     var m = members[i];
-    h += '<div class="who' + (m.out ? " out" : "") + '">'
-      + '<span class="dot" style="background:' + m.tint + '"></span>'
+    var d = document.createElement("div");
+    d.className = "who" + (m.out ? " out" : "");
+    d.innerHTML = '<span class="dot" style="background:' + m.tint + '"></span>'
       + (m.name ? '<span class="nm">' + esc(m.name) + "</span>" : "")
       + '<span class="gauge"><i class="' + (m.fatigue > 0.7 ? "hot" : "")
-      + '" style="width:' + (m.fatigue * 100) + '%"></i></span>'
-      + "</div>";
+      + '" style="width:' + (m.fatigue * 100) + '%"></i></span>';
+    $bar.appendChild(d);
   }
-  h += '<button id="count">' + calls + "\u56de</button>";
-  $bar.innerHTML = h;
-  document.getElementById("count").onclick = togglePanel;
+  var c = document.createElement("button");
+  c.className = "tool";
+  c.style.marginLeft = "auto";
+  c.textContent = calls + "\u56de";
+  $bar.appendChild(c);
 }
 
+/* ── スレッド一覧 ── */
+function drawThreads(){
+  var h = "";
+  for (var i = 0; i < threads.length; i++){
+    var t = threads[i];
+    var faces = t.seats.map(function(s){
+      var r = infoOf(s);
+      return r ? r.flag + " " + r.label : s;
+    }).join(" \u30fb ");
+    h += '<div class="thread"><div class="t" data-room="' + esc(t.room) + '">'
+      + "<b>" + esc(t.title || "\uff08\u540d\u524d\u306a\u3057\uff09") + "</b>"
+      + "<small>" + esc(faces || "\uff08\u8ab0\u3082\u3044\u306a\u3044\uff09") + "</small>"
+      + '</div><button class="x" data-del="' + esc(t.room) + '">\u00d7</button></div>';
+  }
+  h += '<button id="newthread">\uff0b \u65b0\u3057\u3044\u30b0\u30eb\u30fc\u30d7</button>';
+  $threads.innerHTML = h;
+
+  var ts = $threads.querySelectorAll(".t");
+  for (var a = 0; a < ts.length; a++){
+    ts[a].onclick = function(){ enter(this.getAttribute("data-room")); };
+  }
+  var xs = $threads.querySelectorAll(".x");
+  for (var b = 0; b < xs.length; b++){
+    xs[b].onclick = function(){ delThread(this.getAttribute("data-del")); };
+  }
+  document.getElementById("newthread").onclick = openInvite;
+  drawBar();
+}
+
+/* ── 招待画面 ── */
+function openInvite(){
+  picked = [];
+  show("invite");
+  drawInvite();
+}
+function drawInvite(){
+  var byOrg = {};
+  for (var i = 0; i < roster.length; i++){
+    var r = roster[i];
+    (byOrg[r.org] = byOrg[r.org] || []).push(r);
+  }
+  var h = '<input id="tname" placeholder="\u30b0\u30eb\u30fc\u30d7\u540d">';
+  h += "<h3>\u547c\u3073\u305f\u3044\u4eba\u3092\u9078\u3093\u3067</h3>";
+  for (var org in byOrg){
+    h += '<div class="org">' + esc(org) + "</div>";
+    for (var j = 0; j < byOrg[org].length; j++){
+      var m = byOrg[org][j];
+      var on = picked.indexOf(m.id) !== -1;
+      h += '<div class="card' + (on ? " on" : "") + '" data-id="' + esc(m.id) + '">'
+        + '<span class="f">' + m.flag + "</span>"
+        + '<span class="m"><b>' + esc(m.label) + (m.preferred ? ' <span class="star">\u2726</span>' : "")
+        + "</b><small>" + esc(m.home) + "</small></span>"
+        + '<span class="k">' + m.room + "</span></div>";
+    }
+  }
+  h += '<button id="go">\u3053\u306e\u4eba\u305f\u3061\u3067\u59cb\u3081\u308b</button>';
+  $invite.innerHTML = h;
+
+  var cs = $invite.querySelectorAll(".card");
+  for (var k = 0; k < cs.length; k++){
+    cs[k].onclick = function(){
+      var id = this.getAttribute("data-id");
+      var at = picked.indexOf(id);
+      if (at === -1) picked.push(id); else picked.splice(at, 1);
+      var name = document.getElementById("tname").value;
+      drawInvite();
+      document.getElementById("tname").value = name;
+    };
+  }
+  document.getElementById("go").onclick = createThread;
+  drawBar();
+}
+
+function createThread(){
+  if (!picked.length) return;
+  var name = document.getElementById("tname").value.trim();
+  var id = "r" + Date.now().toString(36);
+  fetch(WORKER + "/threads", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ room: id, title: name, seats: picked })
+  }).then(function(){
+    return loadThreads();
+  }).then(function(){
+    enter(id);
+  })["catch"](function(){ faults["_"] = "\u4f5c\u308c\u306a\u304b\u3063\u305f"; });
+}
+
+function delThread(id){
+  fetch(WORKER + "/threads?room=" + id, { method: "DELETE" })
+    .then(loadThreads)["catch"](function(){});
+}
+
+function loadThreads(){
+  return fetch(WORKER + "/threads").then(function(r){ return r.json(); })
+    .then(function(d){ threads = d.threads || []; drawThreads(); });
+}
+
+/* ── 部屋に入る ── */
+function enter(id){
+  var t = null;
+  for (var i = 0; i < threads.length; i++) if (threads[i].room === id) t = threads[i];
+  if (!t) return;
+  room = id; title = t.title; calls = 0; faults = {}; openCard = null;
+  members = t.seats.map(function(s, i){
+    var r = infoOf(s) || { label: s, flag: "", org: "", home: "" };
+    return { id: s, label: r.label, flag: r.flag, org: r.org, home: r.home,
+             tint: TINTS[i % TINTS.length], name: "", fatigue: 0, out: false };
+  });
+  show("chat");
+  drawBar();
+  $log.innerHTML = "";
+  fetch(WORKER + "/log?room=" + room).then(function(r){ return r.json(); })
+    .then(function(d){
+      msgs = (d.log || []).map(function(x){
+        return { id: String(x.id), who: x.who || "", seat: x.seat || "",
+                 text: x.text, named: !!x.named, leaving: !!x.leaving };
+      });
+      for (var i = 0; i < members.length; i++){
+        for (var j = msgs.length - 1; j >= 0; j--){
+          if (msgs[j].seat === members[i].id && msgs[j].named && msgs[j].who){
+            members[i].name = msgs[j].who; break;
+          }
+        }
+      }
+      drawBar(); drawLog();
+    })["catch"](function(){ faults["_"] = "\u8aad\u3081\u306a\u304b\u3063\u305f"; drawLog(); });
+}
+
+/* ── 会話 ── */
 function drawLog(){
   var h = "";
   for (var i = 0; i < msgs.length; i++){
     var m = msgs[i];
     var mine = m.seat === "me";
-    var tint = mine ? "rgba(255,255,255,0.5)" : tintOf(m.seat);
+    var s = mine ? null : seatOf(m.seat);
+    var tint = mine ? "rgba(255,255,255,0.5)" : (s ? s.tint : "rgba(255,255,255,0.4)");
     var label = (mine || m.named)
       ? '<span style="color:' + tint + '">' + esc(m.who) + "</span>"
       : '<span class="pip" style="background:' + tint + '"></span>';
     h += '<div class="msg' + (m.leaving ? " leaving" : "") + '">'
-      + '<div class="name">' + label + "</div>"
-      + '<div class="body">' + esc(m.text) + "</div></div>";
+      + '<div class="name" data-i="' + i + '">' + label + "</div>";
+    if (openCard === i){
+      h += '<div class="card-id">'
+        + (mine
+            ? "\u4eba\u9593 \u30fb \u65e5\u672c \u30fb \u5973"
+            : (s ? s.flag + " " + esc(s.org) + " \u30fb " + esc(s.label) + " \u30fb " + esc(s.home) : "?"))
+        + "</div>";
+    }
+    h += '<div class="body">' + esc(m.text) + "</div></div>";
   }
-  var ferr = "";
+  var fe = "";
   for (var f in faults){
-    if (faults[f]) ferr += '<div id="fault">' + esc(f + ": " + faults[f]) + "</div>";
+    if (faults[f]) fe += '<div class="fault">' + esc(f + ": " + faults[f]) + "</div>";
   }
-  h += '<div id="think">' + (busy ? "\u2026" : "") + ferr + "</div>";
+  h += '<div id="think">' + (busy ? "\u2026" : "") + fe + "</div>";
   $log.innerHTML = h;
+
+  var ns = $log.querySelectorAll(".name");
+  for (var q = 0; q < ns.length; q++){
+    ns[q].onclick = function(){
+      var i = Number(this.getAttribute("data-i"));
+      openCard = openCard === i ? null : i;
+      drawLog();
+    };
+  }
   $log.scrollTop = $log.scrollHeight;
 }
 
-function togglePanel(){
-  $panel.classList.toggle("on");
-  if (!$panel.classList.contains("on")) return;
-  var h = '<div id="deplabel">\u9023\u9396\u306e\u4e0a\u9650\u3000' + maxDepth + "</div>"
-    + '<input type="range" min="0" max="14" value="' + maxDepth + '" id="dep">';
-  for (var i = 0; i < members.length; i++){
-    h += '<div style="line-height:1.9;color:#8b95a0">'
-      + (members[i].name ? esc(members[i].name) : "\uff08\u307e\u3060\u540d\u4e57\u3063\u3066\u306a\u3044\uff09")
-      + " \u2014 " + esc(members[i].provider) + "</div>";
-  }
-  h += '<button class="btn" id="wipe">\u3053\u306e\u90e8\u5c4b\u306e\u4f1a\u8a71\u3092\u6d88\u3059</button>';
-  $panel.innerHTML = h;
-  document.getElementById("dep").oninput = function(e){
-    maxDepth = Number(e.target.value);
-    document.getElementById("deplabel").textContent =
-      "\u9023\u9396\u306e\u4e0a\u9650\u3000" + maxDepth;
-  };
-  document.getElementById("wipe").onclick = wipe;
-}
-
-function wipe(){
-  fetch(WORKER + "/log?room=" + ROOM, { method: "DELETE" }).then(function(){
-    msgs = [];
-    for (var i = 0; i < members.length; i++){
-      members[i].name = ""; members[i].fatigue = 0; members[i].out = false;
-    }
-    $panel.classList.remove("on");
-    drawBar(); drawLog();
-  })["catch"](function(){ faults["_"] = "\u6d88\u305b\u306a\u304b\u3063\u305f"; drawLog(); });
-}
-
-function keep(entry){
-  fetch(WORKER + "/log?room=" + ROOM, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(entry)
+function keep(e){
+  fetch(WORKER + "/log?room=" + room, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(e)
   })["catch"](function(){});
 }
 
 function ask(seat, called){
-  var me = null;
-  for (var i = 0; i < members.length; i++){
-    if (members[i].id === seat) me = members[i];
-  }
+  var me = seatOf(seat);
   if (!me || me.out) return Promise.resolve(null);
+  var roll = members.map(function(m){ return { name: m.name, out: m.out }; });
+  var tail = msgs.slice(-14).map(function(m){ return { who: m.who, text: m.text }; });
 
-  var roster = [];
-  for (var j = 0; j < members.length; j++){
-    roster.push({ name: members[j].name, out: members[j].out });
-  }
-  var tail = msgs.slice(-14).map(function(m){
-    return { who: m.who, text: m.text };
-  });
-
-  return fetch(WORKER + "/speak?room=" + ROOM, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      provider: me.provider, model: me.model, name: me.name,
-      fatigue: me.fatigue, called: called, members: roster, log: tail
-    })
+  return fetch(WORKER + "/speak?room=" + room, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ seat: seat, name: me.name, fatigue: me.fatigue,
+                           called: called, members: roll, log: tail })
   }).then(function(r){ return r.json(); }).then(function(data){
     calls++;
     if (data.error){
-      faults[me.provider] = String(data.error).slice(0, 90);
+      faults[me.label] = String(data.error).slice(0, 120);
       drawBar(); drawLog(); return null;
     }
     var out = data.out || {};
-    faults[me.provider] = "";
+    faults[me.label] = "";
     var nm = (out.name || "").trim();
 
     for (var k = 0; k < members.length; k++){
       if (members[k].id === seat){
         if (nm) members[k].name = nm;
         if (out.leaving) members[k].out = true;
-        members[k].fatigue = Math.min(1,
-          members[k].fatigue + (out.speak ? TIRE : LISTEN));
+        members[k].fatigue = Math.min(1, members[k].fatigue + (out.speak ? TIRE : LISTEN));
       } else {
         members[k].fatigue = Math.max(0, members[k].fatigue - REST);
       }
     }
 
     if (out.leaving){
-      var bye = {
-        who: nm || me.name || "", seat: seat, named: !!(nm || me.name),
-        text: (out.text || "").trim() || "\u5c11\u3057\u4f11\u3080", leaving: true
-      };
+      var bye = { who: nm || me.name || "", seat: seat, named: !!(nm || me.name),
+                  text: (out.text || "").trim() || "\u5c11\u3057\u4f11\u3080", leaving: true };
       msgs.push(bye); keep(bye); drawBar(); drawLog();
       return null;
     }
-    if (!out.speak || !out.text){
-      drawBar(); drawLog();
-      return { called: null, stay: false };
-    }
+    if (!out.speak || !out.text){ drawBar(); drawLog(); return { called: null, stay: false }; }
 
     var text = out.text.trim();
-    var entry = {
-      who: nm || me.name || "", seat: seat, text: text,
-      named: !!(nm || me.name)
-    };
-    msgs.push(entry); keep(entry); drawBar(); drawLog();
+    var e = { who: nm || me.name || "", seat: seat, text: text, named: !!(nm || me.name) };
+    msgs.push(e); keep(e); drawBar(); drawLog();
 
     var hit = null;
     for (var n = 0; n < members.length; n++){
       var o = members[n];
-      if (o.id !== seat && !o.out && o.name && text.indexOf("@" + o.name) !== -1){
-        hit = o.id;
-      }
+      if (o.id !== seat && !o.out && o.name && text.indexOf("@" + o.name) !== -1) hit = o.id;
     }
     return { called: hit, stay: !!out.stay };
   })["catch"](function(){
-    faults[me.provider] = "\u5c4a\u304b\u306a\u304b\u3063\u305f"; drawLog(); return null;
+    faults[me.label] = "\u5c4a\u304b\u306a\u304b\u3063\u305f"; drawLog(); return null;
   });
 }
 
@@ -287,7 +459,6 @@ function runRound(seed){
       return opening(i + 1);
     });
   }
-
   function chain(){
     if (!next || d >= maxDepth) return Promise.resolve();
     d++;
@@ -300,10 +471,7 @@ function runRound(seed){
       return chain();
     });
   }
-
-  return opening(0).then(chain).then(function(){
-    busy = false; drawLog();
-  });
+  return opening(0).then(chain).then(function(){ busy = false; drawLog(); });
 }
 
 function send(){
@@ -320,37 +488,16 @@ function send(){
 }
 
 $send.onclick = send;
+$back.onclick = function(){
+  if (view === "chat" || view === "invite"){ show("threads"); loadThreads(); }
+};
 
-drawBar();
-
-fetch(WORKER + "/providers").then(function(r){ return r.json(); }).then(function(pr){
-  var list = pr.providers || [];
-  members = list.map(function(p, i){
-    return {
-      id: p.id, provider: p.id, model: p.model,
-      tint: TINTS[i % TINTS.length], name: "", fatigue: 0, out: false
-    };
-  });
-  drawBar();
-  return fetch(WORKER + "/log?room=" + ROOM).then(function(r){ return r.json(); });
-}).then(function(lg){
-  msgs = (lg.log || []).map(function(r){
-    return {
-      who: r.who || "", seat: r.seat || "", text: r.text,
-      named: !!r.named, leaving: !!r.leaving
-    };
-  });
-  for (var i = 0; i < members.length; i++){
-    for (var j = msgs.length - 1; j >= 0; j--){
-      if (msgs[j].seat === members[i].id && msgs[j].named && msgs[j].who){
-        members[i].name = msgs[j].who; break;
-      }
-    }
-  }
-  drawBar(); drawLog();
+/* ── 起動 ── */
+fetch(WORKER + "/roster").then(function(r){ return r.json(); }).then(function(d){
+  roster = d.roster || [];
+  return loadThreads();
 })["catch"](function(e){
-  faults["_"] = "\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: " + e;
-  drawBar(); drawLog();
+  $threads.innerHTML = '<div class="fault">\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: ' + esc(e) + "</div>";
 });
 </script>
 </body>
