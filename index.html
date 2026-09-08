@@ -41,7 +41,7 @@ button,input,textarea{font-family:inherit}
 }
 .pick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .pick button{
-  padding:7px 13px;border-radius:20px;font-size:12.5px;
+  padding:6px 11px;border-radius:20px;font-size:12px;
   border:1px solid rgba(255,255,255,.14);background:none;
   color:rgba(255,255,255,.5);
 }
@@ -53,6 +53,11 @@ button,input,textarea{font-family:inherit}
   width:100%;padding:13px;border-radius:5px;margin-top:26px;
   border:1px solid rgba(255,255,255,.24);background:#3b4a44;
   color:rgba(255,255,255,.9);font-size:18px;
+}
+#whoami{
+  text-align:center;margin-top:26px;font-size:11px;
+  color:rgba(255,255,255,.3);font-family:'EB Garamond',serif;
+  letter-spacing:.04em;
 }
 #gerr{color:#c9a08f;font-size:12px;margin-top:12px;min-height:16px}
 .g{
@@ -218,8 +223,8 @@ button,input,textarea{font-family:inherit}
 <div id="gate">
   <div class="gwrap">
     <div class="gtitle"><span class="g">&#960;&#943;&#954;&#959;</span></div>
-    <input id="pass" placeholder="合言葉" autocapitalize="off" autocorrect="off">
-    <input id="myname" placeholder="名前">
+    <input id="pass" placeholder="password" type="password" autocapitalize="off" autocorrect="off">
+    <input id="myname" placeholder="name">
     <div class="glabel">who are you?</div>
     <div class="pick" id="pkind"></div>
     <div class="glabel">from</div>
@@ -246,10 +251,14 @@ var TIRE = 0.17, LISTEN = 0.04, REST = 0.045;
 var view = "gate";          // gate | threads | invite | chat
 var pass = "", me = { name: "", kind: "human", from: "\ud83c\uddef\ud83c\uddf5 Japan", as: "he" };
 
-var KINDS = ["human", "cat", "ghost", "?"];
-var FROMS = ["\ud83c\uddef\ud83c\uddf5 Japan", "\ud83c\uddf9\ud83c\udded Thailand",
-             "\ud83c\uddf2\ud83c\uddfe Malaysia", "\ud83c\udf0d elsewhere"];
-var ASES  = ["he", "she", "they", "\u2014"];
+var KINDS = ["human", "AI"];
+var FROMS = [
+  "\ud83c\uddef\ud83c\uddf5 Japan", "\ud83c\uddf0\ud83c\uddf7 Korea",
+  "\ud83c\uddf2\ud83c\uddfe Malaysia", "\ud83c\uddf9\ud83c\udded Thailand",
+  "\ud83c\uddeb\ud83c\uddef Fiji", "\ud83c\udde8\ud83c\udde6 Canada",
+  "\ud83c\uddf2\ud83c\uddfd Mexico"
+];
+var ASES  = ["he", "she"];
 var roster = [], threads = [];
 var room = null, title = "", members = [], msgs = [];
 var picked = [], calls = 0, maxDepth = 6;
@@ -321,12 +330,12 @@ function enter_piko(){
   fetch(WORKER + "/hello?k=" + encodeURIComponent(p))
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if (!d.ok){ err.textContent = "\u9055\u3046\u307f\u305f\u3044"; return; }
+      if (!d.ok){ err.textContent = "wrong password"; return; }
       pass = p; me.name = n; err.textContent = "";
       saveMe();
       show("threads");
       boot();
-    })["catch"](function(){ err.textContent = "\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f"; });
+    })["catch"](function(){ err.textContent = "could not reach \u03c0\u03af\u03ba\u03bf"; });
 }
 
 function seatOf(id){
@@ -397,6 +406,7 @@ function drawThreads(){
     }
   }
   h += '<button id="newthread">open a new <span class="g">\u03c0\u03af\u03ba\u03bf</span></button>';
+  h += '<div id="whoami">' + esc(me.name) + " \u30fb " + esc(myCard()) + "</div>";
   $threads.innerHTML = h;
 
   var ts = $threads.querySelectorAll(".t");
@@ -420,6 +430,13 @@ function drawThreads(){
     };
   }
   document.getElementById("newthread").onclick = openInvite;
+  document.getElementById("whoami").onclick = function(){
+    document.getElementById("pass").value = pass;
+    document.getElementById("myname").value = me.name;
+    document.getElementById("gerr").textContent = "";
+    drawPicks();
+    show("gate");
+  };
   drawBar();
 }
 
