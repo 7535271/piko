@@ -25,6 +25,36 @@ body{
 }
 button,input,textarea{font-family:inherit}
 .hide{display:none!important}
+#gate{flex:1;overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:24px 18px}
+#gate::-webkit-scrollbar{width:0}
+.gwrap{width:100%;max-width:340px;text-align:center}
+.gtitle{font-size:34px;color:rgba(255,255,255,.85);margin-bottom:26px}
+#gate input{
+  width:100%;padding:12px 15px;border-radius:5px;margin-bottom:10px;
+  border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.045);
+  color:rgba(255,255,255,.92);font-size:16px;text-align:center;
+}
+#gate input::placeholder{color:rgba(255,255,255,.3)}
+.glabel{
+  font-size:11px;color:rgba(255,255,255,.35);margin:14px 0 7px;
+  font-family:'EB Garamond',serif;letter-spacing:.1em;
+}
+.pick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pick button{
+  padding:7px 13px;border-radius:20px;font-size:12.5px;
+  border:1px solid rgba(255,255,255,.14);background:none;
+  color:rgba(255,255,255,.5);
+}
+.pick button.on{
+  border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.92);
+}
+#enter{
+  width:100%;padding:13px;border-radius:5px;margin-top:26px;
+  border:1px solid rgba(255,255,255,.24);background:#3b4a44;
+  color:rgba(255,255,255,.9);font-size:18px;
+}
+#gerr{color:#c9a08f;font-size:12px;margin-top:12px;min-height:16px}
 .g{
   font-family:'EB Garamond',serif;
   font-weight:500;
@@ -35,6 +65,7 @@ button,input,textarea{font-family:inherit}
 
 /* ── 上のバー ── */
 #bar{
+  position:relative;
   padding:12px 14px 10px;
   padding-top:calc(12px + env(safe-area-inset-top));
   border-bottom:1px solid rgba(255,255,255,.11);
@@ -44,17 +75,25 @@ button,input,textarea{font-family:inherit}
 #back{background:none;border:0;color:rgba(255,255,255,.5);font-size:17px;padding:2px 4px}
 #title{font-size:16px;color:#dfe6e0;flex:1;min-width:60px;font-family:'EB Garamond',serif;letter-spacing:0}
 #title.gr{
-  text-align:center;font-size:19px;letter-spacing:0;
+  font-size:19px;letter-spacing:0;
   font-family:'EB Garamond',serif;font-weight:400;
   color:rgba(255,255,255,.72);
 }
 #tname{font-family:'EB Garamond',serif;font-weight:500;letter-spacing:0;font-size:19px}
 #tname::placeholder{color:rgba(255,255,255,.32)}
 #go,#newthread{font-size:18px;font-weight:400}
+#title.home,#title.gr{
+  position:absolute;
+  left:0;right:0;top:50%;
+  transform:translateY(-50%);
+  text-align:center;
+  pointer-events:none;
+  margin:0;padding:0;
+}
 #title.home{
-  text-align:center;font-size:25px;letter-spacing:0;
+  font-size:25px;letter-spacing:0;
   font-family:'EB Garamond',serif;font-weight:500;
-  color:rgba(255,255,255,.85);padding:2px 0 4px;
+  color:rgba(255,255,255,.85);
 }
 .who{display:flex;align-items:center;gap:5px}
 .dot{width:10px;height:10px;border-radius:50%}
@@ -171,11 +210,27 @@ button,input,textarea{font-family:inherit}
 <body>
 
 <div id="bar">
+  <span style="visibility:hidden;font-size:25px;line-height:1.35">&#160;</span>
   <button id="back" class="hide">&#8592;</button>
   <div id="title" class="home"><span class="g">&#960;&#943;&#954;&#959;</span></div>
 </div>
 
-<div id="threads"></div>
+<div id="gate">
+  <div class="gwrap">
+    <div class="gtitle"><span class="g">&#960;&#943;&#954;&#959;</span></div>
+    <input id="pass" placeholder="合言葉" autocapitalize="off" autocorrect="off">
+    <input id="myname" placeholder="名前">
+    <div class="glabel">who are you?</div>
+    <div class="pick" id="pkind"></div>
+    <div class="glabel">from</div>
+    <div class="pick" id="pfrom"></div>
+    <div class="glabel">as</div>
+    <div class="pick" id="pas"></div>
+    <button id="enter"><span class="g">&#960;&#940;&#956;&#949;</span></button>
+    <div id="gerr"></div>
+  </div>
+</div>
+<div id="threads" class="hide"></div>
 <div id="invite" class="hide"></div>
 <div id="log" class="hide"></div>
 <div id="foot" class="hide">
@@ -188,12 +243,19 @@ var WORKER = "https://piko-worker.stella-753-5271.workers.dev";
 var TINTS = ["#a8c8d8","#e8c4a0","#b8d8b0","#d8b8d0","#c8c0e0","#e0c8b0"];
 var TIRE = 0.17, LISTEN = 0.04, REST = 0.045;
 
-var view = "threads";       // threads | invite | chat
+var view = "gate";          // gate | threads | invite | chat
+var pass = "", me = { name: "", kind: "human", from: "\ud83c\uddef\ud83c\uddf5 Japan", as: "he" };
+
+var KINDS = ["human", "cat", "ghost", "?"];
+var FROMS = ["\ud83c\uddef\ud83c\uddf5 Japan", "\ud83c\uddf9\ud83c\udded Thailand",
+             "\ud83c\uddf2\ud83c\uddfe Malaysia", "\ud83c\udf0d elsewhere"];
+var ASES  = ["he", "she", "they", "\u2014"];
 var roster = [], threads = [];
 var room = null, title = "", members = [], msgs = [];
 var picked = [], calls = 0, maxDepth = 6;
 var busy = false, faults = {}, openCard = null, pendingDel = null, thinker = null;
 
+var $gate = document.getElementById("gate");
 var $bar = document.getElementById("bar");
 var $back = document.getElementById("back");
 var $title = document.getElementById("title");
@@ -211,12 +273,62 @@ function esc(s){
 }
 function show(v){
   view = v;
+  $gate.classList.toggle("hide", v !== "gate");
+  $bar.classList.toggle("hide", v === "gate");
   $threads.classList.toggle("hide", v !== "threads");
   $invite.classList.toggle("hide", v !== "invite");
   $log.classList.toggle("hide", v !== "chat");
   $foot.classList.toggle("hide", v !== "chat");
   $back.classList.toggle("hide", v === "threads");
 }
+function drawPicks(){
+  function fill(el, list, cur, set){
+    el.innerHTML = "";
+    for (var i = 0; i < list.length; i++){
+      (function(v){
+        var b = document.createElement("button");
+        b.textContent = v;
+        if (v === cur()) b.className = "on";
+        b.onclick = function(){ set(v); drawPicks(); };
+        el.appendChild(b);
+      })(list[i]);
+    }
+  }
+  fill(document.getElementById("pkind"), KINDS,
+       function(){ return me.kind; }, function(v){ me.kind = v; });
+  fill(document.getElementById("pfrom"), FROMS,
+       function(){ return me.from; }, function(v){ me.from = v; });
+  fill(document.getElementById("pas"), ASES,
+       function(){ return me.as; }, function(v){ me.as = v; });
+}
+
+function myCard(){
+  return me.kind + " \u30fb " + me.from + " \u30fb " + me.as;
+}
+
+function saveMe(){
+  try {
+    localStorage.setItem("piko", JSON.stringify({ pass: pass, me: me }));
+  } catch (e) {}
+}
+
+function enter_piko(){
+  var p = document.getElementById("pass").value.trim();
+  var n = document.getElementById("myname").value.trim();
+  var err = document.getElementById("gerr");
+  if (!n){ err.textContent = "name?"; return; }
+  err.textContent = "\u2026";
+  fetch(WORKER + "/hello?k=" + encodeURIComponent(p))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok){ err.textContent = "\u9055\u3046\u307f\u305f\u3044"; return; }
+      pass = p; me.name = n; err.textContent = "";
+      saveMe();
+      show("threads");
+      boot();
+    })["catch"](function(){ err.textContent = "\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f"; });
+}
+
 function seatOf(id){
   for (var i = 0; i < members.length; i++) if (members[i].id === id) return members[i];
   return null;
@@ -359,7 +471,7 @@ function createThread(){
   if (!picked.length) return;
   var name = document.getElementById("tname").value.trim();
   var id = "r" + Date.now().toString(36);
-  fetch(WORKER + "/threads", {
+  fetch(WORKER + "/threads?k=" + encodeURIComponent(pass), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ room: id, title: name, seats: picked })
@@ -371,12 +483,12 @@ function createThread(){
 }
 
 function delThread(id){
-  fetch(WORKER + "/threads?room=" + id, { method: "DELETE" })
+  fetch(WORKER + "/threads?k=" + encodeURIComponent(pass) + "&room=" + id, { method: "DELETE" })
     .then(loadThreads)["catch"](function(){});
 }
 
 function loadThreads(){
-  return fetch(WORKER + "/threads").then(function(r){ return r.json(); })
+  return fetch(WORKER + "/threads?k=" + encodeURIComponent(pass)).then(function(r){ return r.json(); })
     .then(function(d){ threads = d.threads || []; drawThreads(); });
 }
 
@@ -394,11 +506,12 @@ function enter(id){
   show("chat");
   drawBar();
   $log.innerHTML = "";
-  fetch(WORKER + "/log?room=" + room).then(function(r){ return r.json(); })
+  fetch(WORKER + "/log?k=" + encodeURIComponent(pass) + "&room=" + room).then(function(r){ return r.json(); })
     .then(function(d){
       msgs = (d.log || []).map(function(x){
         return { id: String(x.id), who: x.who || "", seat: x.seat || "",
-                 text: x.text, named: !!x.named, leaving: !!x.leaving };
+                 text: x.text, named: !!x.named, leaving: !!x.leaving,
+                 card: x.card || "" };
       });
       for (var i = 0; i < members.length; i++){
         for (var j = msgs.length - 1; j >= 0; j--){
@@ -427,7 +540,7 @@ function drawLog(){
     if (openCard === i){
       h += '<div class="card-id" data-close="1">'
         + (mine
-            ? "human \u30fb Japan \u30fb he"
+            ? esc(m.card || myCard())
             : (s ? s.flag + " " + esc(s.org) + " \u30fb " + esc(s.label) + " \u30fb " + esc(s.home) : "?"))
         + "</div>";
     }
@@ -470,14 +583,14 @@ function rename(){
   if (n === null) return;
   title = n.trim();
   var seats = members.map(function(m){ return m.id; });
-  fetch(WORKER + "/threads", {
+  fetch(WORKER + "/threads?k=" + encodeURIComponent(pass), {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ room: room, title: title, seats: seats })
   }).then(function(){ drawBar(); })["catch"](function(){});
 }
 
 function keep(e){
-  fetch(WORKER + "/log?room=" + room, {
+  fetch(WORKER + "/log?k=" + encodeURIComponent(pass) + "&room=" + room, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify(e)
   })["catch"](function(){});
@@ -490,7 +603,7 @@ function ask(seat, called){
   var roll = members.map(function(m){ return { name: m.name, out: m.out }; });
   var tail = msgs.slice(-14).map(function(m){ return { who: m.who, text: m.text }; });
 
-  return fetch(WORKER + "/speak?room=" + room, {
+  return fetch(WORKER + "/speak?k=" + encodeURIComponent(pass) + "&room=" + room, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ seat: seat, name: me.name, fatigue: me.fatigue,
                            called: called, members: roll, log: tail })
@@ -570,7 +683,7 @@ function runRound(seed){
 function send(){
   var t = $say.value.trim();
   if (!t || busy) return;
-  var mine = { who: "\u3057\u3085\u3046", seat: "me", text: t, named: true };
+  var mine = { who: me.name, seat: "me", text: t, named: true, card: myCard() };
   msgs.push(mine); keep(mine); $say.value = ""; drawLog();
   var seed = null;
   for (var i = 0; i < members.length; i++){
@@ -590,12 +703,44 @@ $back.onclick = function(){
 };
 
 /* ── 起動 ── */
-fetch(WORKER + "/roster").then(function(r){ return r.json(); }).then(function(d){
-  roster = d.roster || [];
-  return loadThreads();
-})["catch"](function(e){
-  $threads.innerHTML = '<div class="fault">\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: ' + esc(e) + "</div>";
+function boot(){
+  return fetch(WORKER + "/roster?k=" + encodeURIComponent(pass))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      roster = d.roster || [];
+      return loadThreads();
+    })["catch"](function(e){
+      $threads.innerHTML = '<div class="fault">\u3064\u306a\u304c\u3089\u306a\u304b\u3063\u305f: ' + esc(e) + "</div>";
+    });
+}
+
+document.getElementById("enter").onclick = enter_piko;
+document.getElementById("pass").addEventListener("keydown", function(e){
+  if (e.key === "Enter") enter_piko();
 });
+document.getElementById("myname").addEventListener("keydown", function(e){
+  if (e.key === "Enter") enter_piko();
+});
+
+(function(){
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem("piko") || "null"); } catch (e) {}
+  if (saved && saved.me) {
+    me = saved.me;
+    document.getElementById("myname").value = me.name || "";
+    if (saved.pass) document.getElementById("pass").value = saved.pass;
+  }
+  drawPicks();
+  show("gate");
+  // 覚えている合言葉が通るならそのまま入る
+  if (saved && saved.pass && saved.me && saved.me.name) {
+    fetch(WORKER + "/hello?k=" + encodeURIComponent(saved.pass))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d.ok){ pass = saved.pass; show("threads"); boot(); }
+      })["catch"](function(){});
+  }
+})();
 </script>
 </body>
 </html>
