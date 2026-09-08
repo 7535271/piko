@@ -111,6 +111,9 @@ button,input,textarea{font-family:inherit}
 .gauge i.hot{background:#e0a98c}
 .out{opacity:.34}
 .tool{background:none;border:0;color:rgba(255,255,255,.42);font-size:11px;padding:2px 3px}
+#reload{font-size:17px;padding:2px 6px;line-height:1}
+#reload.spin{animation:turn .7s linear}
+@keyframes turn{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 
 /* ── スレッド一覧 ── */
 #threads{flex:1;overflow-y:auto;padding:20px 16px}
@@ -392,9 +395,16 @@ function drawBar(){
       + '" style="width:' + (m.fatigue * 100) + '%"></i></span>';
     $bar.appendChild(d);
   }
+  var rl = document.createElement("button");
+  rl.className = "tool";
+  rl.id = "reload";
+  rl.style.marginLeft = "auto";
+  rl.innerHTML = "&#8635;";
+  rl.onclick = function(){ if (!busy) refreshLog(); };
+  $bar.appendChild(rl);
+
   var c = document.createElement("button");
   c.className = "tool";
-  c.style.marginLeft = "auto";
   c.textContent = calls + "\u56de";
   $bar.appendChild(c);
 }
@@ -736,10 +746,10 @@ $say.addEventListener("focus", function(){
   setTimeout(function(){ if (view === "chat") $log.scrollTop = $log.scrollHeight; }, 260);
 });
 
-/* ── 下に引っぱって更新 ── */
-var pullY = 0, pulling = false;
-
+/* ── 更新 ── */
 function refreshLog(){
+  var b = document.getElementById("reload");
+  if (b) b.classList.add("spin");
   return fetch(WORKER + "/log?k=" + encodeURIComponent(pass) + "&room=" + room)
     .then(function(r){ return r.json(); })
     .then(function(d){
@@ -758,33 +768,8 @@ function refreshLog(){
       }
       openCard = null;
       drawBar(); drawLog(msgs.length === seen);
-    })["catch"](function(){});
+    })["catch"](function(){ drawBar(); });
 }
-
-$log.addEventListener("touchstart", function(e){
-  pulling = $log.scrollTop <= 0 && !busy;
-  pullY = e.touches[0].clientY;
-}, { passive: true });
-
-$log.addEventListener("touchmove", function(e){
-  if (!pulling) return;
-  var d = e.touches[0].clientY - pullY;
-  if (d > 6) {
-    $log.style.transform = "translateY(" + Math.min(d * 0.32, 46) + "px)";
-    $log.style.opacity = 1 - Math.min(d / 700, 0.25);
-  }
-}, { passive: true });
-
-$log.addEventListener("touchend", function(e){
-  if (!pulling) return;
-  var d = (e.changedTouches[0].clientY - pullY);
-  $log.style.transition = "transform .28s ease, opacity .28s ease";
-  $log.style.transform = "";
-  $log.style.opacity = "";
-  setTimeout(function(){ $log.style.transition = ""; }, 300);
-  pulling = false;
-  if (d > 68) refreshLog();
-}, { passive: true });
 
 $send.onclick = send;
 $back.onclick = function(){
