@@ -39,9 +39,10 @@ button,input,textarea{font-family:inherit}
   font-size:11px;color:rgba(255,255,255,.35);margin:14px 0 7px;
   font-family:'EB Garamond',serif;letter-spacing:.1em;
 }
-.pick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.pick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:9px}
+#pfrom button{font-size:19px;padding:4px 8px;line-height:1.25}
 .pick button{
-  padding:6px 11px;border-radius:20px;font-size:12px;
+  padding:6px 11px;border-radius:20px;font-size:12.5px;
   border:1px solid rgba(255,255,255,.14);background:none;
   color:rgba(255,255,255,.5);
 }
@@ -225,11 +226,11 @@ button,input,textarea{font-family:inherit}
     <div class="gtitle"><span class="g">&#960;&#943;&#954;&#959;</span></div>
     <input id="pass" placeholder="password" type="password" autocapitalize="off" autocorrect="off">
     <input id="myname" placeholder="name">
-    <div class="glabel">who are you?</div>
+    <div class="glabel">your card</div>
     <div class="pick" id="pkind"></div>
-    <div class="glabel">from</div>
+    
     <div class="pick" id="pfrom"></div>
-    <div class="glabel">as</div>
+    
     <div class="pick" id="pas"></div>
     <button id="enter"><span class="g">&#960;&#940;&#956;&#949;</span></button>
     <div id="gerr"></div>
@@ -249,14 +250,15 @@ var TINTS = ["#a8c8d8","#e8c4a0","#b8d8b0","#d8b8d0","#c8c0e0","#e0c8b0"];
 var TIRE = 0.17, LISTEN = 0.04, REST = 0.045;
 
 var view = "gate";          // gate | threads | invite | chat
-var pass = "", me = { name: "", kind: "human", from: "\ud83c\uddef\ud83c\uddf5 Japan", as: "he" };
+var pass = "", me = { name: "", kind: "human", from: "\ud83c\uddef\ud83c\uddf5", as: "he" };
 
 var KINDS = ["human", "AI"];
+// 行った順。フランスだけ、まだ
 var FROMS = [
-  "\ud83c\uddef\ud83c\uddf5 Japan", "\ud83c\uddf0\ud83c\uddf7 Korea",
-  "\ud83c\uddf2\ud83c\uddfe Malaysia", "\ud83c\uddf9\ud83c\udded Thailand",
-  "\ud83c\uddeb\ud83c\uddef Fiji", "\ud83c\udde8\ud83c\udde6 Canada",
-  "\ud83c\uddf2\ud83c\uddfd Mexico"
+  "\ud83c\uddef\ud83c\uddf5", "\ud83c\uddfa\ud83c\uddf8", "\ud83c\uddeb\ud83c\uddef",
+  "\ud83c\uddf0\ud83c\uddf7", "\ud83c\udde8\ud83c\udde6", "\ud83c\uddf2\ud83c\uddfd",
+  "\ud83c\uddf2\ud83c\uddfe", "\ud83c\uddf9\ud83c\udded", "\ud83c\udde8\ud83c\uddf3",
+  "\ud83c\uddeb\ud83c\uddf7"
 ];
 var ASES  = ["he", "she"];
 var roster = [], threads = [];
