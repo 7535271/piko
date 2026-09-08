@@ -610,7 +610,7 @@ function drawLog(hold){
       drawLog(true);
     };
   }
-  $log.scrollTop = $log.scrollHeight;
+  $log.scrollTop = hold ? keep0 : $log.scrollHeight;
 }
 
 function rename(){
