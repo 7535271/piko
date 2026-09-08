@@ -271,7 +271,7 @@ var FROMS = [
 var ASES  = ["he", "she"];
 var roster = [], threads = [];
 var room = null, title = "", members = [], msgs = [];
-var picked = [], calls = 0, maxDepth = 6;
+var picked = [], maxDepth = 6;
 var busy = false, faults = {}, openCard = null, pendingDel = null, thinker = null;
 var dry = {};   // 今日尽きた財布
 
@@ -403,10 +403,7 @@ function drawBar(){
   rl.onclick = function(){ if (!busy) refreshLog(); };
   $bar.appendChild(rl);
 
-  var c = document.createElement("button");
-  c.className = "tool";
-  c.textContent = calls + "\u56de";
-  $bar.appendChild(c);
+
 }
 
 /* ── スレッド一覧 ── */
@@ -542,7 +539,7 @@ function enter(id){
   var t = null;
   for (var i = 0; i < threads.length; i++) if (threads[i].room === id) t = threads[i];
   if (!t) return;
-  room = id; title = t.title; calls = 0; faults = {}; openCard = null;
+  room = id; title = t.title; faults = {}; openCard = null;
   members = t.seats.map(function(s, i){
     var r = infoOf(s) || { label: s, flag: "", org: "", home: "" };
     return { id: s, label: r.label, flag: r.flag, org: r.org, home: r.home,
@@ -654,7 +651,6 @@ function ask(seat, called){
     body: JSON.stringify({ seat: seat, name: me.name, fatigue: me.fatigue,
                            called: called, members: roll, log: tail })
   }).then(function(r){ return r.json(); }).then(function(data){
-    calls++;
     if (data.error){
       var msg = String(data.error);
       faults[me.label] = msg.slice(0, 120);
