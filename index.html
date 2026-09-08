@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#2e3b36">
 <title>piko</title>
-<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Cormorant+Garamond:wght@300;400;500&subset=greek,latin&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 html,body{height:100%}
@@ -35,6 +35,11 @@ button,input,textarea{font-family:inherit}
 }
 #back{background:none;border:0;color:rgba(255,255,255,.5);font-size:17px;padding:2px 4px}
 #title{font-size:13.5px;color:#dfe6e0;flex:1;min-width:60px}
+#title.gr{
+  text-align:center;font-size:16px;letter-spacing:.05em;
+  font-family:'Cormorant Garamond',serif;color:rgba(255,255,255,.7);
+}
+#tname{font-family:'Cormorant Garamond',serif;letter-spacing:.05em}
 #title.home{
   text-align:center;font-size:22px;letter-spacing:.06em;
   font-family:'Cormorant Garamond','Times New Roman',serif;
@@ -58,18 +63,27 @@ button,input,textarea{font-family:inherit}
 }
 .thread .t{flex:1}
 .thread .t b{font-size:14.5px;font-weight:400;display:block}
-.thread .t small{font-size:11px;color:rgba(255,255,255,.42);line-height:1.7}
+.thread .t small{font-size:11px;color:rgba(255,255,255,.4);line-height:1.75;display:block;margin-top:3px}
 .thread .x{background:none;border:0;color:rgba(255,255,255,.3);font-size:15px;padding:6px}
+.thread .x.yes,.thread .x.no{
+  font-size:12px;padding:7px 11px;border-radius:4px;
+  border:1px solid rgba(255,255,255,.18);
+  font-family:'Cormorant Garamond',serif;letter-spacing:.04em;
+}
+.thread .x.yes{color:#e0a98c}
+.thread .x.no{color:rgba(255,255,255,.55);margin-left:6px}
+.thread .t small.ask{color:rgba(255,255,255,.55)}
 #newthread{
-  width:100%;padding:13px;border-radius:5px;
+  font-family:'Cormorant Garamond',serif;letter-spacing:.05em;
+  width:100%;padding:14px;border-radius:5px;
   border:1px dashed rgba(255,255,255,.24);background:none;
-  color:rgba(255,255,255,.6);font-size:13.5px;margin-top:6px;
+  color:rgba(255,255,255,.55);font-size:15px;margin-top:6px;
 }
 
 /* ── 招待 ── */
 #invite{flex:1;overflow-y:auto;padding:18px 16px}
-#invite h3{font-size:13px;font-weight:400;color:rgba(255,255,255,.5);margin:0 0 12px}
-.org{font-size:11px;color:rgba(255,255,255,.35);margin:16px 0 6px}
+#invite h3{font-size:12.5px;font-weight:400;color:rgba(255,255,255,.45);margin:0 0 4px;letter-spacing:.06em;font-family:'Cormorant Garamond',serif}
+.org{font-size:11px;color:rgba(255,255,255,.35);margin:18px 0 7px;letter-spacing:.08em;font-family:'Cormorant Garamond',serif}
 .card{
   padding:11px 13px;margin-bottom:7px;border-radius:5px;
   border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.025);
@@ -80,12 +94,13 @@ button,input,textarea{font-family:inherit}
 .card .m{flex:1}
 .card .m b{font-size:13.5px;font-weight:400;display:block}
 .card .m small{font-size:10.5px;color:rgba(255,255,255,.38)}
-.card .k{font-size:10px;color:rgba(255,255,255,.3)}
+.card .k{font-size:10px;color:rgba(255,255,255,.28);white-space:nowrap;font-family:'Cormorant Garamond',serif;letter-spacing:.03em}
 .star{color:#e8c4a0}
 #go{
   position:sticky;bottom:0;width:100%;padding:13px;margin-top:14px;
   border-radius:5px;border:1px solid rgba(255,255,255,.24);
-  background:#3b4a44;color:rgba(255,255,255,.9);font-size:14px;
+  background:#3b4a44;color:rgba(255,255,255,.9);font-size:15px;
+  font-family:'Cormorant Garamond',serif;letter-spacing:.05em;
 }
 #tname{
   width:100%;padding:11px 14px;border-radius:5px;margin-bottom:16px;
@@ -108,10 +123,18 @@ button,input,textarea{font-family:inherit}
 }
 .msg.leaving .body{color:rgba(255,255,255,.34);font-style:italic;text-shadow:none}
 .card-id{
-  font-size:10.5px;color:rgba(255,255,255,.4);padding:5px 4px 0;
-  line-height:1.8;
+  font-size:10.5px;color:rgba(255,255,255,.4);padding:4px 4px 2px;
+  line-height:1.8;font-family:'Cormorant Garamond',serif;letter-spacing:.04em;
 }
 #think{font-size:11.5px;color:rgba(255,255,255,.38);padding-left:2px}
+.typing i{
+  display:inline-block;width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.5);margin-right:3px;
+  animation:blip 1.1s infinite;
+}
+.typing i:nth-child(2){animation-delay:.18s}
+.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blip{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:.9;transform:translateY(-2px)}}
 .fault{color:#c9a08f;font-size:11px;margin-top:6px;line-height:1.6;word-break:break-word}
 
 /* ── 入力 ── */
@@ -158,7 +181,7 @@ var view = "threads";       // threads | invite | chat
 var roster = [], threads = [];
 var room = null, title = "", members = [], msgs = [];
 var picked = [], calls = 0, maxDepth = 6;
-var busy = false, faults = {}, openCard = null;
+var busy = false, faults = {}, openCard = null, pendingDel = null, thinker = null;
 
 var $bar = document.getElementById("bar");
 var $back = document.getElementById("back");
@@ -196,8 +219,8 @@ function infoOf(id){
 function drawBar(){
   if (view !== "chat"){
     if (view === "invite"){
-      $title.textContent = "who\u2019s in?";
-      $title.className = "";
+      $title.textContent = "\u03c0\u03bf\u03b9\u03bf\u03b9 \u03b5\u03af\u03bd\u03b1\u03b9 \u03b5\u03b4\u03ce;";
+      $title.className = "gr";
     } else {
       $title.textContent = "\u03c0\u03af\u03ba\u03bf";
       $title.className = "home";
@@ -206,8 +229,10 @@ function drawBar(){
     for (var q = 0; q < old.length; q++) old[q].remove();
     return;
   }
-  $title.textContent = title || "";
+  $title.textContent = title || "\u03cc\u03bd\u03bf\u03bc\u03b1";
   $title.className = "";
+  $title.onclick = rename;
+  $title.style.cursor = "pointer";
   var olds = $bar.querySelectorAll(".who,.tool");
   for (var r = 0; r < olds.length; r++) olds[r].remove();
   for (var i = 0; i < members.length; i++){
@@ -236,10 +261,17 @@ function drawThreads(){
       var r = infoOf(s);
       return r ? r.flag + " " + r.label : s;
     }).join(" \u30fb ");
-    h += '<div class="thread"><div class="t" data-room="' + esc(t.room) + '">'
-      + "<b>" + esc(t.title || "untitled") + "</b>"
-      + "<small>" + esc(faces || "nobody yet") + "</small>"
-      + '</div><button class="x" data-del="' + esc(t.room) + '">\u00d7</button></div>';
+    if (pendingDel === t.room){
+      h += '<div class="thread"><div class="t"><b>' + esc(t.title || "untitled") + "</b>"
+        + '<small class="ask">close this \u03c0\u03b1\u03c1\u03ad\u03b1 for good?</small></div>'
+        + '<button class="x yes" data-yes="' + esc(t.room) + '">close</button>'
+        + '<button class="x no">keep</button></div>';
+    } else {
+      h += '<div class="thread"><div class="t" data-room="' + esc(t.room) + '">'
+        + "<b>" + esc(t.title || "untitled") + "</b>"
+        + "<small>" + esc(faces || "nobody yet") + "</small>"
+        + '</div><button class="x" data-del="' + esc(t.room) + '">\u00d7</button></div>';
+    }
   }
   h += '<button id="newthread">open a new \u03c0\u03af\u03ba\u03bf</button>';
   $threads.innerHTML = h;
@@ -250,7 +282,19 @@ function drawThreads(){
   }
   var xs = $threads.querySelectorAll(".x");
   for (var b = 0; b < xs.length; b++){
-    xs[b].onclick = function(){ delThread(this.getAttribute("data-del")); };
+    xs[b].onclick = function(){
+      if (this.className.indexOf("yes") !== -1){
+        var r = this.getAttribute("data-yes");
+        pendingDel = null;
+        delThread(r);
+      } else if (this.className.indexOf("no") !== -1){
+        pendingDel = null;
+        drawThreads();
+      } else {
+        pendingDel = this.getAttribute("data-del");
+        drawThreads();
+      }
+    };
   }
   document.getElementById("newthread").onclick = openInvite;
   drawBar();
@@ -268,7 +312,7 @@ function drawInvite(){
     var r = roster[i];
     (byOrg[r.org] = byOrg[r.org] || []).push(r);
   }
-  var h = '<input id="tname" placeholder="name this \u03c0\u03af\u03ba\u03bf">';
+  var h = '<input id="tname" placeholder="\u03cc\u03bd\u03bf\u03bc\u03b1">';
   h += "<h3>tap to invite</h3>";
   for (var org in byOrg){
     h += '<div class="org">' + esc(org) + "</div>";
@@ -282,7 +326,7 @@ function drawInvite(){
         + '<span class="k">~' + m.room + ' turns/day</span></div>';
     }
   }
-  h += '<button id="go">start the \u03c0\u03b1\u03c1\u03ad\u03b1</button>';
+  h += '<button id="go">\u03c0\u03ac\u03bc\u03b5 \u03c0\u03b1\u03c1\u03ad\u03b1</button>';
   $invite.innerHTML = h;
 
   var cs = $invite.querySelectorAll(".card");
@@ -370,7 +414,7 @@ function drawLog(){
     h += '<div class="msg' + (m.leaving ? " leaving" : "") + '">'
       + '<div class="name" data-i="' + i + '">' + label + "</div>";
     if (openCard === i){
-      h += '<div class="card-id">'
+      h += '<div class="card-id" data-close="1">'
         + (mine
             ? "human \u30fb Japan \u30fb he"
             : (s ? s.flag + " " + esc(s.org) + " \u30fb " + esc(s.label) + " \u30fb " + esc(s.home) : "?"))
@@ -382,9 +426,22 @@ function drawLog(){
   for (var f in faults){
     if (faults[f]) fe += '<div class="fault">' + esc(f + ": " + faults[f]) + "</div>";
   }
-  h += '<div id="think">' + (busy ? "\u2026" : "") + fe + "</div>";
+  var tip = "";
+  if (busy && thinker){
+    tip = '<span class="dot" style="background:' + thinker.tint
+      + ';width:7px;height:7px;vertical-align:middle;display:inline-block;margin-right:6px"></span>'
+      + esc(thinker.name || thinker.label)
+      + ' <span class="typing"><i></i><i></i><i></i></span>';
+  } else if (busy){
+    tip = '<span class="typing"><i></i><i></i><i></i></span>';
+  }
+  h += '<div id="think">' + tip + fe + "</div>";
   $log.innerHTML = h;
 
+  var cc = $log.querySelectorAll(".card-id");
+  for (var w = 0; w < cc.length; w++){
+    cc[w].onclick = function(){ openCard = null; drawLog(); };
+  }
   var ns = $log.querySelectorAll(".name");
   for (var q = 0; q < ns.length; q++){
     ns[q].onclick = function(){
@@ -394,6 +451,18 @@ function drawLog(){
     };
   }
   $log.scrollTop = $log.scrollHeight;
+}
+
+function rename(){
+  if (view !== "chat") return;
+  var n = prompt("\u03cc\u03bd\u03bf\u03bc\u03b1", title || "");
+  if (n === null) return;
+  title = n.trim();
+  var seats = members.map(function(m){ return m.id; });
+  fetch(WORKER + "/threads", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ room: room, title: title, seats: seats })
+  }).then(function(){ drawBar(); })["catch"](function(){});
 }
 
 function keep(e){
@@ -406,6 +475,7 @@ function keep(e){
 function ask(seat, called){
   var me = seatOf(seat);
   if (!me || me.out) return Promise.resolve(null);
+  thinker = me; drawLog();
   var roll = members.map(function(m){ return { name: m.name, out: m.out }; });
   var tail = msgs.slice(-14).map(function(m){ return { who: m.who, text: m.text }; });
 
@@ -483,7 +553,7 @@ function runRound(seed){
       return chain();
     });
   }
-  return opening(0).then(chain).then(function(){ busy = false; drawLog(); });
+  return opening(0).then(chain).then(function(){ busy = false; thinker = null; drawLog(); });
 }
 
 function send(){
@@ -497,6 +567,13 @@ function send(){
     if (!m.out && m.name && t.indexOf("@" + m.name) !== -1) seed = m.id;
   }
   runRound(seed);
+}
+
+if (window.visualViewport){
+  window.visualViewport.addEventListener("resize", function(){
+    document.body.style.height = window.visualViewport.height + "px";
+    if (view === "chat") $log.scrollTop = $log.scrollHeight;
+  });
 }
 
 $send.onclick = send;
