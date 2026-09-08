@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- piko build 2026-09-08 #12 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
@@ -39,8 +40,9 @@ button,input,textarea{font-family:inherit}
   font-size:11px;color:rgba(255,255,255,.35);margin:14px 0 7px;
   font-family:'EB Garamond',serif;letter-spacing:.1em;
 }
-.pick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:9px}
+.pick{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
 #pfrom button{font-size:19px;padding:4px 8px;line-height:1.25}
+#pas{margin-bottom:0}
 .pick button{
   padding:6px 11px;border-radius:20px;font-size:12.5px;
   border:1px solid rgba(255,255,255,.14);background:none;
@@ -146,6 +148,9 @@ button,input,textarea{font-family:inherit}
   display:flex;align-items:center;gap:10px;
 }
 .card.on{border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.075)}
+.card.dry{border-color:rgba(224,140,110,.32);background:rgba(224,120,90,.06)}
+.card.dry .m b,.card.dry .f{opacity:.42}
+.card.dry .k{color:#d99a7c}
 .card .f{font-size:16px}
 .card .m{flex:1}
 .card .m b{font-size:13.5px;font-weight:400;display:block}
@@ -265,6 +270,14 @@ var roster = [], threads = [];
 var room = null, title = "", members = [], msgs = [];
 var picked = [], calls = 0, maxDepth = 6;
 var busy = false, faults = {}, openCard = null, pendingDel = null, thinker = null;
+var dry = {};   // 今日尽きた財布
+
+function today(){ return new Date().toISOString().slice(0, 10); }
+function isDry(home){ return dry[home] === today(); }
+function markDry(home){
+  dry[home] = today();
+  try { localStorage.setItem("piko_dry", JSON.stringify(dry)); } catch (e) {}
+}
 
 var $gate = document.getElementById("gate");
 var $bar = document.getElementById("bar");
@@ -314,7 +327,7 @@ function drawPicks(){
 }
 
 function myCard(){
-  return me.kind + " \u30fb " + me.from + " \u30fb " + me.as;
+  return me.from + " \u30fb " + me.kind + " \u30fb " + me.as;
 }
 
 function saveMe(){
@@ -461,11 +474,14 @@ function drawInvite(){
     for (var j = 0; j < byOrg[org].length; j++){
       var m = byOrg[org][j];
       var on = picked.indexOf(m.id) !== -1;
-      h += '<div class="card' + (on ? " on" : "") + '" data-id="' + esc(m.id) + '">'
+      var out = isDry(m.home);
+      h += '<div class="card' + (on ? " on" : "") + (out ? " dry" : "")
+        + '" data-id="' + esc(m.id) + '">'
         + '<span class="f">' + m.flag + "</span>"
         + '<span class="m"><b>' + esc(m.label) + (m.preferred ? ' <span class="star">\u2726</span>' : "")
         + "</b><small>" + esc(m.home) + "</small></span>"
-        + '<span class="k">~' + m.room + ' turns/day</span></div>';
+        + '<span class="k">' + (out ? "empty till tomorrow" : "~" + m.room + " turns/day")
+        + "</span></div>";
     }
   }
   h += '<button id="go"><span class="g">\u03c0\u03ac\u03bc\u03b5 \u03c0\u03b1\u03c1\u03ad\u03b1</span></button>';
@@ -544,7 +560,8 @@ function enter(id){
 }
 
 /* ── 会話 ── */
-function drawLog(){
+function drawLog(hold){
+  var keep0 = $log.scrollTop;
   var h = "";
   for (var i = 0; i < msgs.length; i++){
     var m = msgs[i];
@@ -560,7 +577,7 @@ function drawLog(){
       h += '<div class="card-id" data-close="1">'
         + (mine
             ? esc(m.card || myCard())
-            : (s ? s.flag + " " + esc(s.org) + " \u30fb " + esc(s.label) + " \u30fb " + esc(s.home) : "?"))
+            : (s ? s.flag + " \u30fb " + esc(s.org) + " \u30fb " + esc(s.label) : "?"))
         + "</div>";
     }
     h += '<div class="body">' + esc(m.text) + "</div></div>";
@@ -583,14 +600,14 @@ function drawLog(){
 
   var cc = $log.querySelectorAll(".card-id");
   for (var w = 0; w < cc.length; w++){
-    cc[w].onclick = function(){ openCard = null; drawLog(); };
+    cc[w].onclick = function(){ openCard = null; drawLog(true); };
   }
   var ns = $log.querySelectorAll(".name");
   for (var q = 0; q < ns.length; q++){
     ns[q].onclick = function(){
       var i = Number(this.getAttribute("data-i"));
       openCard = openCard === i ? null : i;
-      drawLog();
+      drawLog(true);
     };
   }
   $log.scrollTop = $log.scrollHeight;
@@ -629,7 +646,10 @@ function ask(seat, called){
   }).then(function(r){ return r.json(); }).then(function(data){
     calls++;
     if (data.error){
-      faults[me.label] = String(data.error).slice(0, 120);
+      var msg = String(data.error);
+      faults[me.label] = msg.slice(0, 120);
+      if (/4006|used up your daily free allocation|daily limit/i.test(msg)) markDry(me.home);
+      if (/429|rate.?limit|quota|exceeded/i.test(msg)) markDry(me.home);
       drawBar(); drawLog(); return null;
     }
     var out = data.out || {};
@@ -744,6 +764,7 @@ document.getElementById("myname").addEventListener("keydown", function(e){
 (function(){
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem("piko") || "null"); } catch (e) {}
+  try { dry = JSON.parse(localStorage.getItem("piko_dry") || "{}") || {}; } catch (e) { dry = {}; }
   if (saved && saved.me) {
     me = saved.me;
     document.getElementById("myname").value = me.name || "";
