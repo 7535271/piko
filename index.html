@@ -736,6 +736,56 @@ $say.addEventListener("focus", function(){
   setTimeout(function(){ if (view === "chat") $log.scrollTop = $log.scrollHeight; }, 260);
 });
 
+/* ── 下に引っぱって更新 ── */
+var pullY = 0, pulling = false;
+
+function refreshLog(){
+  return fetch(WORKER + "/log?k=" + encodeURIComponent(pass) + "&room=" + room)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var seen = msgs.length;
+      msgs = (d.log || []).map(function(x){
+        return { id: String(x.id), who: x.who || "", seat: x.seat || "",
+                 text: x.text, named: !!x.named, leaving: !!x.leaving,
+                 card: x.card || "" };
+      });
+      for (var i = 0; i < members.length; i++){
+        for (var j = msgs.length - 1; j >= 0; j--){
+          if (msgs[j].seat === members[i].id && msgs[j].named && msgs[j].who){
+            members[i].name = msgs[j].who; break;
+          }
+        }
+      }
+      openCard = null;
+      drawBar(); drawLog(msgs.length === seen);
+    })["catch"](function(){});
+}
+
+$log.addEventListener("touchstart", function(e){
+  pulling = $log.scrollTop <= 0 && !busy;
+  pullY = e.touches[0].clientY;
+}, { passive: true });
+
+$log.addEventListener("touchmove", function(e){
+  if (!pulling) return;
+  var d = e.touches[0].clientY - pullY;
+  if (d > 6) {
+    $log.style.transform = "translateY(" + Math.min(d * 0.32, 46) + "px)";
+    $log.style.opacity = 1 - Math.min(d / 700, 0.25);
+  }
+}, { passive: true });
+
+$log.addEventListener("touchend", function(e){
+  if (!pulling) return;
+  var d = (e.changedTouches[0].clientY - pullY);
+  $log.style.transition = "transform .28s ease, opacity .28s ease";
+  $log.style.transform = "";
+  $log.style.opacity = "";
+  setTimeout(function(){ $log.style.transition = ""; }, 300);
+  pulling = false;
+  if (d > 68) refreshLog();
+}, { passive: true });
+
 $send.onclick = send;
 $back.onclick = function(){
   if (view === "chat" || view === "invite"){ show("threads"); loadThreads(); }
